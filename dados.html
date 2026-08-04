@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="description" content="Atualize sua foto, seus dados pessoais e a segurança da conta."/>
+  <meta name="theme-color" content="#ea1d2c"/>
+  <title>Dados da Conta | Delivery</title>
+  <link href="assets/favicon.svg" rel="icon" type="image/svg+xml"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="css/paginas.css?v=2.6.1" rel="stylesheet"/>
+  <link href="css/dados.css?v=3.3.0" rel="stylesheet"/>
+  <link href="css/accessibility.css?v=2.6.1" rel="stylesheet"/>
+  <link href="css/enhancements.css?v=3.1.0" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+</head>
+<body>
+  <noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
+  <header class="page-header"><a class="voltar" href="perfil.html" aria-label="Voltar para minha conta">←</a><h1>Dados da Conta</h1></header>
+
+  <main class="page-main dados-main">
+    <section class="page-card foto-card" aria-labelledby="fotoTitulo">
+      <div class="foto-cabecalho"><div><span>PERSONALIZAÇÃO</span><h2 id="fotoTitulo">Foto de perfil</h2><p>Escolha uma foto para aparecer na sua área do cliente.</p></div><span class="foto-status" id="fotoStatus" aria-live="polite">Carregando...</span></div>
+      <div class="foto-editor">
+        <div class="avatar-preview" id="avatarPreview">
+          <img id="avatarImagem" alt="Sua foto de perfil" hidden/>
+          <span id="avatarIniciais" aria-hidden="true">U</span>
+        </div>
+        <div class="foto-controles">
+          <strong>Use uma foto clara e centralizada</strong>
+          <p>JPG, PNG ou WEBP de até 8 MB. A imagem será recortada em formato quadrado e otimizada antes do envio.</p>
+          <div class="foto-acoes">
+            <label class="btn foto-escolher">
+              Escolher foto
+              <input class="avatar-input" id="fotoInput" type="file" accept="image/jpeg,image/png,image/webp"/>
+            </label>
+            <button class="btn" id="salvarFoto" type="button" disabled>Salvar foto</button>
+            <button class="btn secundario" id="removerFoto" type="button" hidden>Remover</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-card">
+      <h2>Informações pessoais</h2>
+      <form id="dadosForm">
+        <div class="grid">
+          <div class="field"><label for="nome">Nome</label><input autocomplete="given-name" id="nome" maxlength="80" required/></div>
+          <div class="field"><label for="sobrenome">Sobrenome</label><input autocomplete="family-name" id="sobrenome" maxlength="100"/></div>
+          <div class="field"><label for="telefone">Telefone</label><input autocomplete="tel" id="telefone" maxlength="30"/></div>
+          <div class="field"><label for="cpf">CPF</label><input autocomplete="off" id="cpf" inputmode="numeric" maxlength="14"/></div>
+          <div class="field"><label for="email">E-mail</label><input autocomplete="email" disabled id="email" type="email"/></div>
+        </div>
+        <button class="btn" type="submit">Salvar alterações</button>
+      </form>
+    </section>
+
+    <section class="page-card">
+      <h2>Alterar senha</h2>
+      <form id="senhaForm">
+        <div class="grid">
+          <div class="field"><label for="novaSenha">Nova senha</label><input autocomplete="new-password" id="novaSenha" maxlength="72" minlength="6" required type="password"/></div>
+          <div class="field"><label for="confirmarNovaSenha">Confirmar nova senha</label><input autocomplete="new-password" id="confirmarNovaSenha" maxlength="72" minlength="6" required type="password"/></div>
+        </div>
+        <button class="btn" type="submit">Atualizar senha</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/dados.js?v=3.3.0"></script>
+  <script src="js/site-enhancements.js?v=2.6.1"></script>
+</body>
+</html>

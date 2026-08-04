@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restaurante | Delivery</title>
+<link href="assets/favicon.svg" rel="icon" type="image/svg+xml"/>
+<link href="css/style.css?v=2.6.1" rel="stylesheet"/>
+<link href="css/restaurante.css?v=3.4.0" rel="stylesheet"/>
+<link href="css/carrinho.css?v=2.6.1" rel="stylesheet"/>
+<link href="css/modal.css?v=3.2.1" rel="stylesheet"/>
+<link href="css/accessibility.css?v=2.6.1" rel="stylesheet"/><meta content="Restaurante | Delivery — plataforma de pedidos e restaurantes." name="description"/><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#ea1d2c"><link rel="stylesheet" href="css/enhancements.css?v=3.4.0"></head>
+<body><noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
+<header>
+<a class="voltar" href="index.html">←</a>
+<div class="logo">
+        Delivery
+    </div>
+<button class="cart" type="button" aria-label="Abrir carrinho">
+        🛒
+        <span>0</span>
+</button>
+</header>
+<!-- Banner -->
+<section class="banner-restaurante">
+<img alt="Banner do Restaurante" id="bannerRestaurante" src="assets/banner-padrao.svg"/>
+</section>
+<!-- Informações -->
+<section class="info-restaurante">
+<img alt="Logo do Restaurante" class="logo-restaurante" id="logoRestaurante" src="assets/logo-restaurante.svg"/>
+<div>
+<h1 id="nomeRestaurante">
+
+            Carregando...
+
+        </h1>
+<p id="descricaoRestaurante">
+
+            Aguarde...
+
+        </p>
+<p id="infoEntrega">
+
+            Carregando informações...
+
+        </p>
+</div>
+</section>
+<section class="restaurante-meta">
+  <div class="metas">
+    <span class="status-badge aberta" id="statusBadge">Carregando status...</span>
+    <span class="meta-chip" id="avaliacaoRestaurante">☆ Novo</span>
+    <span class="meta-chip" id="tempoEntrega">Entrega rápida</span>
+    <span class="meta-chip" id="pedidoMinimo">Pedido mínimo R$ 0,00</span>
+  </div>
+  <div class="restaurant-actions">
+    <button id="btnVerCarrinho" type="button" class="btn-primary">Ver carrinho • <span id="contadorCarrinho">0</span></button>
+  </div>
+</section>
+<!-- Pesquisa -->
+<section class="pesquisa-produtos">
+<input aria-label="Pesquisar produtos" autocomplete="off" id="pesquisaProduto" maxlength="120" placeholder="Pesquisar produtos" type="text"/>
+</section>
+<!-- Categorias -->
+<section class="categorias" id="categorias">
+<!-- Categorias carregadas pelo JS -->
+</section>
+<!-- Produtos -->
+<section class="produtos">
+<div class="lista-produtos" id="listaProdutos">
+<!-- Produtos carregados pelo JS -->
+</div>
+</section>
+<section class="avaliacoes-publicas" aria-labelledby="avaliacoesTitulo">
+  <div class="avaliacoes-titulo"><div><small>EXPERIÊNCIAS REAIS</small><h2 id="avaliacoesTitulo">O que os clientes dizem</h2></div><span id="avaliacoesContagem"></span></div>
+  <div class="avaliacoes-lista" id="avaliacoesPublicas"><p>Nenhuma avaliação publicada ainda.</p></div>
+</section>
+<!-- Overlay -->
+<div id="overlay"></div>
+<!-- Carrinho -->
+<aside id="carrinho" aria-hidden="true" inert>
+<div class="carrinho-header">
+<h2>Seu Carrinho</h2>
+<button aria-label="Fechar carrinho" id="fecharCarrinho" type="button">×</button>
+</div>
+<div class="carrinho-itens">
+</div>
+<div class="carrinho-footer">
+<div class="linha">
+<span>Subtotal</span>
+<strong id="subtotal">R$ 0,00</strong>
+</div>
+<div class="linha">
+<span>Entrega</span>
+<strong id="taxaEntrega">R$ 0,00</strong>
+</div>
+<div class="linha total">
+<span>Total</span>
+<strong id="total">R$ 0,00</strong>
+</div>
+<button id="btnCheckout" type="button">
+
+            Finalizar Pedido
+
+        </button>
+</div>
+</aside>
+<!-- Modal Produto -->
+<div class="modal" id="produtoModal" aria-hidden="true" inert>
+<div class="modal-content">
+<button class="fechar-modal" type="button">×</button>
+<img alt="Produto" id="modalImagem" src=""/>
+<div class="modal-body">
+<h2 id="modalNome"></h2>
+<p id="modalDescricao"></p>
+<h3>Escolha os adicionais</h3>
+<div id="listaAdicionais"></div>
+<h3>Observações</h3>
+<textarea aria-label="Observações do produto" id="observacao" maxlength="300" placeholder="Ex: sem cebola, molho à parte..."></textarea>
+<div class="quantidade-modal">
+<button id="menosQtd" type="button">−</button>
+<span id="quantidade">1</span>
+<button id="maisQtd" type="button">+</button>
+</div>
+<button id="confirmarProduto" type="button">
+
+                Adicionar ao Carrinho •
+
+                <span id="precoFinal">R$ 0,00</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app-utils.js?v=2.6.1"></script><script src="js/supabase.js?v=2.6.1"></script>
+<script src="js/dialogs.js?v=3.4.0"></script><script src="js/cart-store.js?v=3.4.0"></script>
+<script src="js/restaurante.js?v=3.5.0"></script>
+<script src="js/carrinho.js?v=3.4.0"></script>
+<script src="js/modal.js?v=3.2.1"></script>
+<script src="js/site-enhancements.js?v=2.6.1"></script></body>
+</html>

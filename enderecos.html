@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <title>Meus Endereços | Delivery</title>
+  <meta content="Cadastre e escolha um endereço de entrega." name="description"/>
+  <link href="assets/favicon.svg" rel="icon" type="image/svg+xml"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link href="css/paginas.css?v=2.6.1" rel="stylesheet"/>
+  <link href="css/accessibility.css?v=2.6.1" rel="stylesheet"/>
+  <link href="css/enhancements.css?v=2.6.1" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <meta name="theme-color" content="#ea1d2c"/>
+</head>
+<body>
+  <noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
+  <header class="page-header">
+    <a class="voltar" href="perfil.html" id="voltarEndereco" aria-label="Voltar">←</a>
+    <h1>Meus Endereços</h1>
+  </header>
+  <main class="page-main">
+    <section class="page-card" aria-labelledby="novoEnderecoTitulo">
+      <h2 id="novoEnderecoTitulo">Adicionar endereço</h2>
+      <form id="enderecoForm">
+        <div class="grid">
+          <div class="field">
+            <label for="apelido">Apelido</label>
+            <input autocomplete="off" id="apelido" maxlength="40" placeholder="Casa, Trabalho..." value="Casa" required/>
+          </div>
+          <div class="field">
+            <label for="cep">CEP</label>
+            <input autocomplete="postal-code" id="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" required/>
+          </div>
+          <div class="field field-wide">
+            <label for="logradouro">Rua ou avenida</label>
+            <input autocomplete="address-line1" id="logradouro" maxlength="160" required/>
+          </div>
+          <div class="field">
+            <label for="numero">Número</label>
+            <input autocomplete="address-line2" id="numero" maxlength="20" required/>
+          </div>
+          <div class="field">
+            <label for="complemento">Complemento</label>
+            <input autocomplete="address-line2" id="complemento" maxlength="100" placeholder="Apto., bloco..."/>
+          </div>
+          <div class="field">
+            <label for="bairro">Bairro</label>
+            <input id="bairro" maxlength="100" required/>
+          </div>
+          <div class="field">
+            <label for="cidade">Cidade</label>
+            <input autocomplete="address-level2" id="cidade" maxlength="100" required/>
+          </div>
+          <div class="field">
+            <label for="uf">UF</label>
+            <input autocomplete="address-level1" id="uf" maxlength="2" pattern="[A-Za-z]{2}" placeholder="SP" required/>
+          </div>
+          <div class="field field-wide">
+            <label for="referencia">Ponto de referência</label>
+            <input id="referencia" maxlength="160" placeholder="Próximo a..."/>
+          </div>
+        </div>
+        <label class="checkbox-admin">
+          <input id="principal" type="checkbox" checked/>
+          Usar como endereço principal
+        </label>
+        <button class="btn" type="submit">Salvar endereço</button>
+      </form>
+    </section>
+
+    <section aria-labelledby="enderecosSalvosTitulo">
+      <div class="section-title-inline">
+        <h2 id="enderecosSalvosTitulo">Endereços salvos</h2>
+        <a class="btn secundario" href="checkout.html" id="continuarEndereco" hidden>Continuar pedido</a>
+      </div>
+      <div class="lista" id="listaEnderecos" aria-live="polite">
+        <div class="empty">Carregando endereços...</div>
+      </div>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/enderecos.js?v=2.6.1"></script>
+  <script src="js/site-enhancements.js?v=2.6.1"></script>
+</body>
+</html>

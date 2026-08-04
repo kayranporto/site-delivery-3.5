@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="description" content="Defina uma nova senha para sua conta Multi Delivery."/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <meta name="theme-color" content="#ea1d2c"/>
+  <title>Criar nova senha | Multi Delivery</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="stylesheet" href="css/paginas.css?v=2.6.1"/>
+  <link rel="stylesheet" href="css/accessibility.css?v=2.6.1"/>
+</head>
+<body>
+  <noscript>Este site precisa de JavaScript habilitado.</noscript>
+  <header class="page-header"><a class="voltar" href="login.html">←</a><h1>Nova senha</h1></header>
+  <main class="page-main" style="max-width:620px">
+    <section class="page-card">
+      <h2>Proteja sua conta</h2>
+      <p class="muted" id="statusRecuperacao">Verificando o link de recuperação...</p>
+      <form id="novaSenhaForm" hidden>
+        <div class="field"><label for="novaSenha">Nova senha</label><input id="novaSenha" type="password" autocomplete="new-password" minlength="8" maxlength="72" required/><small>Use pelo menos 8 caracteres, com letra e número.</small></div>
+        <div class="field"><label for="confirmarSenha">Confirmar nova senha</label><input id="confirmarSenha" type="password" autocomplete="new-password" minlength="8" maxlength="72" required/></div>
+        <button class="btn" type="submit">Atualizar senha</button>
+      </form>
+      <a id="novoLinkRecuperacao" href="recuperar-senha.html" hidden>Solicitar um novo link</a>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/nova-senha.js?v=3.1.0"></script>
+</body>
+</html>
+

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="Acompanhe pedidos e gerencie sua conta no Delivery." name="description"/>
+  <meta name="theme-color" content="#ea1d2c"/>
+  <title>Minha Conta | Delivery</title>
+  <link href="assets/favicon.svg" rel="icon" type="image/svg+xml"/>
+  <link href="css/style.css?v=2.6.1" rel="stylesheet"/>
+  <link href="css/perfil.css?v=3.5.0" rel="stylesheet"/>
+  <link href="css/accessibility.css?v=2.6.1" rel="stylesheet"/>
+  <link href="css/enhancements.css?v=3.1.0" rel="stylesheet"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+</head>
+<body>
+  <noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
+
+  <header class="perfil-header">
+    <div class="perfil-header-inner">
+      <a class="voltar" href="index.html" aria-label="Voltar para o início">←</a>
+      <div class="header-title">
+        <span>Área do cliente</span>
+        <h1>Minha conta</h1>
+      </div>
+      <a class="explorar-link" href="index.html">Explorar restaurantes</a>
+    </div>
+  </header>
+
+  <main class="perfil-container">
+    <section class="usuario-card" aria-labelledby="nomeUsuario">
+      <a class="avatar-link" href="dados.html" aria-label="Alterar foto de perfil"><div class="avatar" id="avatarUsuario"><span>U</span></div><span class="avatar-camera" aria-hidden="true">📷</span></a>
+      <div class="usuario-info">
+        <span class="boas-vindas">Olá, <strong id="primeiroNome">cliente</strong>!</span>
+        <h2 id="nomeUsuario">Carregando perfil...</h2>
+        <p id="emailUsuario"></p>
+        <div class="usuario-meta">
+          <span class="conta-badge">● Conta ativa</span>
+          <span id="membroDesde">Cliente Delivery</span>
+        </div>
+      </div>
+      <a class="editar-perfil" href="dados.html">Editar perfil</a>
+    </section>
+
+    <section class="resumo-conta" aria-label="Resumo da conta">
+      <article class="resumo-card">
+        <span class="resumo-icone" aria-hidden="true">📦</span>
+        <div><strong id="totalPedidosPerfil">—</strong><span>Pedidos realizados</span></div>
+      </article>
+      <article class="resumo-card">
+        <span class="resumo-icone andamento" aria-hidden="true">🛵</span>
+        <div><strong id="pedidosAndamentoPerfil">—</strong><span>Em andamento</span></div>
+      </article>
+      <article class="resumo-card">
+        <span class="resumo-icone favorito" aria-hidden="true">♥</span>
+        <div><strong id="totalFavoritosPerfil">—</strong><span>Favoritos</span></div>
+      </article>
+      <article class="resumo-card">
+        <span class="resumo-icone economia" aria-hidden="true">%</span>
+        <div><strong id="economiaPerfil">—</strong><span>Economia em cupons</span></div>
+      </article>
+    </section>
+
+    <div class="perfil-grid">
+      <div class="perfil-principal">
+        <section class="painel-card pedido-destaque" aria-labelledby="pedidoDestaqueTitulo">
+          <div class="secao-cabecalho">
+            <div>
+              <span class="secao-kicker">Seu pedido</span>
+              <h2 id="pedidoDestaqueTitulo">Pedido mais recente</h2>
+            </div>
+            <a href="meus-pedidos.html">Ver todos</a>
+          </div>
+          <div class="pedido-conteudo" id="pedidoDestaque" aria-live="polite">
+            <div class="perfil-loading">Buscando seus pedidos...</div>
+          </div>
+        </section>
+
+        <section class="painel-card" aria-labelledby="atalhosTitulo">
+          <div class="secao-cabecalho">
+            <div>
+              <span class="secao-kicker">Acesso rápido</span>
+              <h2 id="atalhosTitulo">O que você precisa?</h2>
+            </div>
+          </div>
+          <nav class="menu" aria-label="Opções da conta">
+            <a class="menu-item" href="meus-pedidos.html">
+              <span class="menu-icone pedidos" aria-hidden="true">📦</span>
+              <span class="menu-texto"><strong>Meus pedidos</strong><small>Acompanhe entregas e consulte seu histórico</small></span>
+              <span class="menu-seta" aria-hidden="true">›</span>
+            </a>
+            <a class="menu-item" href="favoritos.html">
+              <span class="menu-icone favoritos" aria-hidden="true">♥</span>
+              <span class="menu-texto"><strong>Favoritos</strong><small>Encontre rapidamente os lugares que você gosta</small></span>
+              <span class="menu-seta" aria-hidden="true">›</span>
+            </a>
+            <a class="menu-item" href="enderecos.html">
+              <span class="menu-icone enderecos" aria-hidden="true">⌖</span>
+              <span class="menu-texto"><strong>Endereços</strong><small>Cadastre sua casa, trabalho e outros locais</small></span>
+              <span class="menu-seta" aria-hidden="true">›</span>
+            </a>
+            <a class="menu-item" href="dados.html">
+              <span class="menu-icone dados" aria-hidden="true">⚙</span>
+              <span class="menu-texto"><strong>Dados e segurança</strong><small>Atualize informações pessoais e sua senha</small></span>
+              <span class="menu-seta" aria-hidden="true">›</span>
+            </a>
+            <a class="menu-item" href="suporte.html">
+              <span class="menu-icone suporte" aria-hidden="true">?</span>
+              <span class="menu-texto"><strong>Ajuda e suporte</strong><small>Abra solicitações e acompanhe as respostas</small></span>
+              <span class="menu-seta" aria-hidden="true">›</span>
+            </a>
+            <a class="menu-item" href="entregador.html">
+              <span class="menu-icone entregas" aria-hidden="true">🛵</span>
+              <span class="menu-texto"><strong>Painel do entregador</strong><small>Cadastre-se, fique online e acompanhe suas rotas</small></span>
+              <span class="menu-seta" aria-hidden="true">›</span>
+            </a>
+            <a class="menu-item admin-menu-item" href="admin.html" id="adminLink" hidden>
+              <span class="menu-icone admin" aria-hidden="true">◆</span>
+              <span class="menu-texto"><strong>Administração <span class="admin-menu-badge">ADMIN</span></strong><small>Aprove restaurantes e acompanhe toda a plataforma</small></span>
+              <span class="menu-seta" aria-hidden="true">›</span>
+            </a>
+          </nav>
+        </section>
+        <section class="painel-card loyalty-card" aria-labelledby="fidelidadeTitulo">
+          <div class="secao-cabecalho"><div><span class="secao-kicker">FIDELIDADE</span><h2 id="fidelidadeTitulo">Seus pontos</h2></div><span class="loyalty-total" id="totalPontosPerfil">0 pontos</span></div>
+          <div class="loyalty-list" id="fidelidadePerfil"><div class="perfil-loading">Buscando seus benefícios...</div></div>
+        </section>
+      </div>
+
+      <aside class="perfil-lateral">
+        <section class="painel-card progresso-card" aria-labelledby="progressoTitulo">
+          <span class="secao-kicker">Cadastro</span>
+          <div class="progresso-titulo">
+            <h2 id="progressoTitulo">Complete seu perfil</h2>
+            <strong id="progressoValor">0%</strong>
+          </div>
+          <div class="progresso-trilha" role="progressbar" aria-labelledby="progressoTitulo" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressoPerfil">
+            <span id="progressoBarra"></span>
+          </div>
+          <p id="progressoMensagem">Verificando suas informações...</p>
+          <a class="acao-secundaria" href="dados.html">Revisar meus dados</a>
+        </section>
+
+        <section class="ajuda-card" aria-labelledby="ajudaTitulo">
+          <span class="ajuda-icone" aria-hidden="true">?</span>
+          <div>
+            <h2 id="ajudaTitulo">Precisa de ajuda?</h2>
+            <p>Consulte os detalhes do pedido ou fale diretamente com o restaurante pelo acompanhamento.</p>
+            <a href="suporte.html">Abrir central de ajuda</a>
+          </div>
+        </section>
+
+        <button class="sair" id="logout" type="button">
+          <span aria-hidden="true">↪</span>
+          Encerrar sessão
+        </button>
+      </aside>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/config.js?v=3.1.0"></script>
+  <script src="js/monitoring.js?v=3.1.0"></script>
+  <script src="js/notifications.js?v=3.1.0"></script>
+  <script src="js/favorites-sync.js?v=3.4.0"></script>
+  <script src="js/perfil.js?v=3.5.0"></script>
+  <script src="js/site-enhancements.js?v=2.6.1"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#111522"/>
+  <meta name="description" content="Administração da plataforma Multi Delivery."/>
+  <title>Administração | Multi Delivery</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/admin.css?v=3.5.0"/>
+  <link rel="stylesheet" href="css/accessibility.css?v=2.6.1"/>
+  <link rel="stylesheet" href="css/enhancements.css?v=3.1.0"/>
+</head>
+<body>
+  <noscript>Este site precisa de JavaScript habilitado.</noscript>
+  <div class="admin-loading" id="adminLoading"><span></span><strong>Verificando acesso administrativo...</strong></div>
+
+  <div class="admin-app" id="adminApp" hidden>
+    <aside class="admin-sidebar" id="adminSidebar">
+      <a class="admin-brand" href="index.html"><span>🍔</span><div><strong>Multi</strong><small>ADMINISTRAÇÃO</small></div></a>
+      <nav aria-label="Seções administrativas">
+        <a class="active" href="#overview">⌂ <span>Visão geral</span></a>
+        <a href="#pedidos">▣ <span>Pedidos</span><b id="pedidosMenu">0</b></a>
+        <a href="#restaurantes">▦ <span>Restaurantes</span><b id="pendentesMenu">0</b></a>
+        <a href="#usuarios">♙ <span>Usuários</span></a>
+        <a href="#entregadores">🛵 <span>Entregadores</span><b id="entregadoresPendentesMenu">0</b></a>
+        <a href="#cupons">% <span>Cupons</span></a>
+        <a href="#relatorios">↗ <span>Relatórios</span></a>
+        <a href="#suporte">? <span>Suporte</span><b id="suporteMenu">0</b></a>
+      </nav>
+      <div class="admin-sidebar-footer"><small>ACESSO PROTEGIDO</small><p>As ações administrativas ficam registradas no banco.</p></div>
+    </aside>
+
+    <div class="admin-shell">
+      <header class="admin-header">
+        <button id="adminMenu" class="admin-menu" type="button" aria-label="Abrir menu">☰</button>
+        <div><span>CONTROLE DA PLATAFORMA</span><h1>Central administrativa</h1></div>
+        <div class="admin-header-actions"><label class="font-size-control"><span>Aa</span><select id="adminFontSize" aria-label="Tamanho das letras"><option value="normal">Normal</option><option value="large">Grande</option><option value="xlarge">Extra grande</option></select></label><a href="perfil.html">Minha conta</a><button id="adminLogout" type="button">Sair</button></div>
+      </header>
+
+      <main class="admin-main">
+        <section class="admin-hero" id="overview">
+          <div><span class="admin-kicker">MULTI DELIVERY 3.5</span><h2>Visão completa da operação.</h2><p>Aprove restaurantes e entregadores, acompanhe pedidos e mantenha a plataforma saudável.</p></div>
+          <div class="admin-health" id="saudeOperacao"><i></i><div><small>STATUS DO SISTEMA</small><strong id="saudeOperacaoTexto">Verificando operação...</strong></div></div>
+        </section>
+
+        <section class="admin-section" id="relatorios">
+          <div class="admin-section-title"><div><span class="admin-kicker">INTELIGÊNCIA OPERACIONAL</span><h2>Relatório do período</h2><p>Indicadores de vendas, cancelamento, entrega e pagamento online.</p></div><div class="report-actions"><select id="periodoRelatorio"><option value="7">7 dias</option><option value="30" selected>30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option></select><button id="exportarRelatorio" type="button">Exportar CSV</button></div></div>
+          <div class="report-grid">
+            <article><small>Entregues</small><strong id="relatorioEntregues">0</strong></article>
+            <article><small>Cancelamento</small><strong id="relatorioCancelamento">0%</strong></article>
+            <article><small>Ticket médio</small><strong id="relatorioTicket">R$ 0,00</strong></article>
+            <article><small>Tempo médio</small><strong id="relatorioTempo">0 min</strong></article>
+            <article><small>Pagamento online</small><strong id="relatorioOnline">0</strong></article>
+          </div>
+          <div class="admin-report-detail"><div><h3>Restaurantes por volume</h3><div id="topRestaurantesAdmin"></div></div><div><h3>Produtos mais vendidos</h3><div id="topProdutosAdmin"></div></div><div><h3>Clientes recorrentes</h3><div id="clientesRecorrentesAdmin"></div></div><div><h3>Segurança do acesso</h3><div id="segurancaLoginAdmin"></div></div><div><h3>Erros recentes monitorados</h3><div id="logsAdmin"></div></div><div class="audit-panel"><h3>Atividades administrativas</h3><div id="auditoriaAdmin"></div></div></div>
+        </section>
+
+        <section class="admin-metrics" aria-label="Indicadores da plataforma">
+          <article><span>▦</span><div><small>Restaurantes</small><strong id="adminTotalEmpresas">0</strong><p><b id="adminPendentes">0</b> aguardando aprovação</p></div></article>
+          <article><span>♙</span><div><small>Usuários</small><strong id="adminTotalUsuarios">0</strong><p><b id="adminBloqueados">0</b> bloqueados</p></div></article>
+          <article><span>▣</span><div><small>Pedidos</small><strong id="adminTotalPedidos">0</strong><p>em toda a plataforma</p></div></article>
+          <article><span>R$</span><div><small>Volume processado</small><strong id="adminFaturamento">R$ 0,00</strong><p>entregues e pagos</p></div></article>
+        </section>
+
+        <section class="admin-overview-grid">
+          <article class="admin-card">
+            <div class="admin-section-title"><div><span class="admin-kicker">ÚLTIMOS 7 DIAS</span><h2>Pedidos e faturamento</h2></div><strong id="adminSemanaTotal">R$ 0,00</strong></div>
+            <div class="admin-chart" id="adminChart"></div>
+          </article>
+          <article class="admin-card">
+            <div class="admin-section-title"><div><span class="admin-kicker">ATIVIDADE</span><h2>Pedidos recentes</h2></div></div>
+            <div class="recent-orders" id="adminPedidosRecentes"></div>
+          </article>
+        </section>
+
+        <section class="admin-section" id="pedidos">
+          <div class="admin-section-title"><div><span class="admin-kicker">OPERAÇÃO EM TEMPO REAL</span><h2>Todos os pedidos</h2><p>Pesquise, filtre e abra os detalhes completos de cada pedido.</p></div><button class="admin-primary-button" id="exportarPedidos" type="button">Exportar filtrados</button></div>
+          <div class="admin-filters" aria-label="Filtros de pedidos">
+            <label class="wide"><span>Buscar</span><input id="buscaAdminPedido" type="search" placeholder="Número, cliente ou restaurante"/></label>
+            <label><span>Restaurante</span><select id="filtroPedidoEmpresa"><option value="">Todos</option></select></label>
+            <label><span>Status</span><select id="filtroPedidoStatus"><option value="">Todos</option><option value="recebido">Recebido</option><option value="preparando">Preparando</option><option value="saiu_para_entrega">Saiu para entrega</option><option value="entregue">Entregue</option><option value="cancelado">Cancelado</option></select></label>
+            <label><span>Pagamento</span><select id="filtroPedidoPagamento"><option value="">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option><option value="estornado">Estornado</option></select></label>
+            <label><span>Data inicial</span><input id="filtroPedidoInicio" type="date"/></label>
+            <label><span>Data final</span><input id="filtroPedidoFim" type="date"/></label>
+            <button class="admin-secondary-button" id="limparFiltrosPedido" type="button">Limpar filtros</button>
+          </div>
+          <div class="admin-table-wrap"><table><thead><tr><th>Pedido</th><th>Restaurante</th><th>Data</th><th>Status</th><th>Pagamento</th><th>Total</th><th>Ação</th></tr></thead><tbody id="adminPedidos"><tr><td colspan="7">Carregando...</td></tr></tbody></table></div>
+          <div class="admin-pagination"><span id="resumoPedidos">0 pedidos</span><div><button id="pedidosAnterior" type="button">← Anterior</button><strong id="paginaPedidos">1</strong><button id="pedidosProxima" type="button">Próxima →</button></div></div>
+        </section>
+
+        <section class="admin-section" id="restaurantes">
+          <div class="admin-section-title"><div><span class="admin-kicker">MODERAÇÃO</span><h2>Restaurantes</h2><p>Aprove cadastros e controle a disponibilidade das lojas.</p></div><label class="admin-search">⌕<input id="buscaAdminEmpresa" type="search" placeholder="Buscar restaurante"/></label></div>
+          <div class="admin-table-wrap"><table><thead><tr><th>Restaurante</th><th>Contato</th><th>Cadastro</th><th>Publicação</th><th>Operação</th><th>Ações</th></tr></thead><tbody id="adminEmpresas"><tr><td colspan="6">Carregando...</td></tr></tbody></table></div>
+        </section>
+
+        <section class="admin-section" id="usuarios">
+          <div class="admin-section-title"><div><span class="admin-kicker">COMUNIDADE</span><h2>Usuários</h2><p>O bloqueio impede novos pedidos sem excluir histórico ou conta.</p></div><label class="admin-search">⌕<input id="buscaAdminUsuario" type="search" placeholder="Buscar usuário"/></label></div>
+          <div class="admin-table-wrap"><table><thead><tr><th>Usuário</th><th>Telefone</th><th>Cadastro</th><th>Status</th><th>Ação</th></tr></thead><tbody id="adminUsuarios"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div>
+        </section>
+
+        <section class="admin-section" id="cupons">
+          <div class="admin-section-title"><div><span class="admin-kicker">PROMOÇÕES</span><h2>Cupons</h2><p>Crie, edite, pause ou exclua benefícios globais e dos restaurantes.</p></div><div class="admin-title-actions"><label class="admin-search">⌕<input id="buscaAdminCupom" type="search" placeholder="Buscar cupom"/></label><button class="admin-primary-button" id="novoCupom" type="button">+ Novo cupom</button></div></div>
+          <div class="admin-table-wrap"><table><thead><tr><th>Código</th><th>Escopo</th><th>Benefício</th><th>Uso</th><th>Validade</th><th>Status</th><th>Ações</th></tr></thead><tbody id="adminCupons"><tr><td colspan="7">Carregando...</td></tr></tbody></table></div>
+        </section>
+
+        <section class="admin-section" id="entregadores">
+          <div class="admin-section-title"><div><span class="admin-kicker">LOGÍSTICA</span><h2>Entregadores</h2><p>Confira os dados e aprove ou suspenda o acesso às entregas.</p></div><label class="admin-search">⌕<input id="buscaAdminEntregador" type="search" placeholder="Buscar entregador"/></label></div>
+          <div class="admin-table-wrap"><table><thead><tr><th>Entregador</th><th>Contato</th><th>Veículo</th><th>Cadastro</th><th>Status</th><th>Ação</th></tr></thead><tbody id="adminEntregadores"><tr><td colspan="6">Carregando...</td></tr></tbody></table></div>
+        </section>
+
+        <section class="admin-section" id="suporte">
+          <div class="admin-section-title"><div><span class="admin-kicker">ATENDIMENTO E RISCO</span><h2>Suporte e pendências</h2><p>Responda clientes, acompanhe cancelamentos, reembolsos e alertas de estoque.</p></div><button class="admin-secondary-button" id="atualizarOperacaoAdmin" type="button">↻ Atualizar</button></div>
+          <div class="ops-health-grid"><article><small>Chamados abertos</small><strong id="opsChamados">0</strong></article><article><small>Cancelamentos</small><strong id="opsCancelamentos">0</strong></article><article><small>Reembolsos</small><strong id="opsReembolsos">0</strong></article><article><small>Estoque baixo</small><strong id="opsEstoque">0</strong></article><article><small>Lojas em pausa</small><strong id="opsPausas">0</strong></article></div>
+          <div class="ops-admin-grid">
+            <article><h3>Chamados recentes</h3><div id="adminChamados"><div class="admin-loading-inline">Carregando chamados...</div></div></article>
+            <article><h3>Cancelamentos e reembolsos</h3><div id="adminReembolsos"><div class="admin-loading-inline">Carregando pendências...</div></div></article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div class="admin-overlay" id="adminOverlay"></div>
+  <div class="admin-modal" id="adminModal" hidden>
+    <button class="admin-modal-backdrop" type="button" data-modal-close aria-label="Fechar janela"></button>
+    <section class="admin-modal-panel" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
+      <header><div><span class="admin-kicker" id="adminModalKicker">ADMINISTRAÇÃO</span><h2 id="adminModalTitle">Detalhes</h2></div><button class="admin-modal-close" type="button" data-modal-close aria-label="Fechar">×</button></header>
+      <div class="admin-modal-body" id="adminModalBody"></div>
+      <footer class="admin-modal-actions" id="adminModalActions"></footer>
+    </section>
+  </div>
+  <div class="sr-only" id="adminLive" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/config.js?v=3.1.0"></script>
+  <script src="js/monitoring.js?v=3.1.0"></script>
+  <script src="js/notifications.js?v=3.1.0"></script>
+  <script src="js/admin.js?v=3.5.0"></script>
+  <script src="js/operacao-admin.js?v=3.5.0"></script>
+  <script src="js/site-enhancements.js?v=2.6.1"></script>
+</body>
+</html>

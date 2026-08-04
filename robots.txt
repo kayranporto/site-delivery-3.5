@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /checkout.html
+Disallow: /dados.html
+Disallow: /entregador.html
+Disallow: /empresa-dashboard.html
+Disallow: /perfil.html
+
+Sitemap: https://kayranporto.github.io/site-delivery-3.5/sitemap.xml

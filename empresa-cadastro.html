@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cadastre seu restaurante no Delivery e comece a gerenciar produtos e pedidos.">
+    <link href="assets/favicon.svg" rel="icon" type="image/svg+xml">
+    <title>Cadastrar restaurante | Delivery</title>
+    <link href="css/auth.css?v=2.6.1" rel="stylesheet">
+    <link href="css/accessibility.css?v=2.6.1" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#ea1d2c"><link rel="stylesheet" href="css/enhancements.css?v=2.6.1"></head>
+<body class="auth-page auth-business auth-register-page">
+<noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
+
+<main class="auth-shell">
+    <section class="auth-showcase" aria-label="Benefícios para restaurantes parceiros">
+        <a class="auth-brand" href="index.html" aria-label="Delivery - página inicial">
+            <span class="auth-brand-mark" aria-hidden="true">🍔</span>
+            <span>Delivery para Restaurantes</span>
+        </a>
+
+        <div class="auth-showcase-content">
+            <p class="auth-kicker"><span class="auth-kicker-dot"></span> Faça parte do Delivery</p>
+            <h2>Leve seu restaurante mais longe.</h2>
+            <p class="auth-showcase-copy">Cadastre sua loja, publique seu cardápio e organize os pedidos em uma experiência criada para parceiros.</p>
+
+            <ul class="auth-benefits">
+                <li><span class="auth-benefit-icon" aria-hidden="true">✓</span> Cadastro simples e painel fácil de usar</li>
+                <li><span class="auth-benefit-icon" aria-hidden="true">✓</span> Controle de categorias, produtos e adicionais</li>
+                <li><span class="auth-benefit-icon" aria-hidden="true">✓</span> Pedidos organizados em um único ambiente</li>
+            </ul>
+        </div>
+
+        <div>
+            <div class="auth-preview" aria-hidden="true">
+                <div class="auth-preview-main">
+                    <span class="auth-preview-icon">📈</span>
+                    <span><strong>Loja pronta para receber pedidos</strong><small>Cardápio e operação sob seu controle</small></span>
+                </div>
+                <span class="auth-preview-status">Online</span>
+            </div>
+            <div class="auth-showcase-foot">
+                <span>Cadastro do parceiro</span>
+                <span>Dados protegidos</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-panel">
+        <div class="auth-panel-inner">
+            <a class="auth-mobile-brand" href="index.html">
+                <span class="auth-brand-mark" aria-hidden="true">🍔</span>
+                <span>Delivery</span>
+            </a>
+
+            <a class="auth-back" href="index.html">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+                Voltar para o início
+            </a>
+
+            <header class="auth-heading">
+                <p class="auth-eyebrow">Cadastro de parceiro</p>
+                <h1>Cadastre seu restaurante</h1>
+                <p>Informe os dados da empresa para criar sua conta administrativa.</p>
+            </header>
+
+            <nav class="auth-role-switch" aria-label="Escolher tipo de cadastro">
+                <a href="cadastro.html">👤 Sou cliente</a>
+                <a class="active" href="empresa-cadastro.html" aria-current="page">🏪 Sou restaurante</a>
+            </nav>
+
+            <form class="auth-form" id="empresaCadastroForm">
+                <div class="auth-field">
+                    <label for="nome">Nome do restaurante</label>
+                    <div class="auth-input-wrap">
+                        <span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10h16"></path><path d="M5 10v10h14V10"></path><path d="m4 10 2-6h12l2 6"></path><path d="M9 20v-6h6v6"></path></svg></span>
+                        <input autocomplete="organization" id="nome" maxlength="100" name="organization" placeholder="Nome da sua loja" required type="text">
+                    </div>
+                </div>
+
+                <div class="auth-grid">
+                    <div class="auth-field">
+                        <label for="email">E-mail comercial</label>
+                        <div class="auth-input-wrap">
+                            <span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"></path><path d="m4 7 8 6 8-6"></path></svg></span>
+                            <input autocomplete="email" id="email" maxlength="254" name="email" placeholder="contato@restaurante.com" required type="email">
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label for="telefone">Telefone</label>
+                        <div class="auth-input-wrap">
+                            <span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-3l-4-1-2 2c-4-1.5-7.5-5-9-9l2-2-1-4Z"></path></svg></span>
+                            <input autocomplete="tel" data-mask="phone" id="telefone" maxlength="15" name="tel" placeholder="(00) 00000-0000" required type="tel">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="cnpj">CNPJ</label>
+                    <div class="auth-input-wrap">
+                        <span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M7 9h4M7 13h7M17 9h.01"></path></svg></span>
+                        <input autocomplete="off" data-mask="cnpj" id="cnpj" inputmode="numeric" maxlength="18" name="cnpj" placeholder="00.000.000/0000-00" required type="text">
+                    </div>
+                    <p class="auth-form-help">Use o CNPJ vinculado ao restaurante. Ele não poderá ser repetido em outra conta.</p>
+                </div>
+
+                <div class="auth-grid">
+                    <div class="auth-field">
+                        <label for="senha">Senha</label>
+                        <div class="auth-input-wrap has-toggle">
+                            <span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span>
+                            <input aria-describedby="senhaEmpresaForca" autocomplete="new-password" data-password-strength="senhaEmpresaForca" id="senha" maxlength="72" minlength="6" name="new-password" placeholder="Mínimo de 6 caracteres" required type="password">
+                            <button class="auth-password-toggle" data-toggle-password="senha" type="button" aria-label="Mostrar senha" aria-pressed="false"></button>
+                        </div>
+                        <div class="auth-strength" data-level="0" id="senhaEmpresaForca">
+                            <div class="auth-strength-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                            <span class="auth-strength-text">Use ao menos 6 caracteres.</span>
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label for="confirmarSenha">Confirmar senha</label>
+                        <div class="auth-input-wrap has-toggle">
+                            <span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span>
+                            <input aria-describedby="senhaEmpresaMatch" autocomplete="new-password" data-match-password="senha" id="confirmarSenha" maxlength="72" minlength="6" name="confirm-password" placeholder="Repita sua senha" required type="password">
+                            <button class="auth-password-toggle" data-toggle-password="confirmarSenha" type="button" aria-label="Mostrar senha" aria-pressed="false"></button>
+                        </div>
+                        <span class="auth-match-hint" id="senhaEmpresaMatch">Repita a mesma senha.</span>
+                    </div>
+                </div>
+
+                <label class="auth-check" for="termosEmpresa">
+                    <input id="termosEmpresa" required type="checkbox">
+                    <span>Confirmo que os dados são verdadeiros e aceito os Termos de Uso para parceiros.</span>
+                </label>
+
+                <button class="auth-button" type="submit">
+                    <span>Criar conta do restaurante</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
+                </button>
+            </form>
+
+            <div class="auth-divider">já é parceiro?</div>
+            <p class="auth-switch-prompt"><a href="empresa-login.html">Entrar na Área do Restaurante</a></p>
+            <p class="auth-security-note">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                Seus dados administrativos ficam protegidos pelas políticas RLS.
+            </p>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app-utils.js?v=2.6.1"></script>
+<script src="js/supabase.js?v=2.6.1"></script>
+<script src="js/auth-ui.js?v=2.6.1"></script>
+<script src="js/empresa-cadastro.js?v=2.6.1"></script>
+<script src="js/site-enhancements.js?v=2.6.1"></script></body>
+</html>

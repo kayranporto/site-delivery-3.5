@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#ea1d2c"/>
+  <title>Acompanhar pedido | Multi Delivery</title>
+  <meta name="description" content="Acompanhe seu pedido, consulte o recibo e avalie sua experiência."/>
+  <link rel="icon" href="assets/favicon.svg"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/acompanhamento.css?v=3.4.0"/>
+  <link rel="stylesheet" href="css/accessibility.css?v=2.6.1"/>
+  <link rel="stylesheet" href="css/enhancements.css?v=3.1.0"/>
+</head>
+<body>
+  <noscript>Este site precisa de JavaScript habilitado.</noscript>
+  <header class="track-header">
+    <a href="meus-pedidos.html" aria-label="Voltar para meus pedidos">←</a>
+    <div><small>ACOMPANHAMENTO</small><h1 id="tituloPedido">Carregando pedido...</h1></div>
+    <span class="live" id="indicadorLive"><i></i><span>AO VIVO</span></span>
+  </header>
+
+  <main class="track-main">
+    <section class="track-hero">
+      <div>
+        <span class="status-pill" id="statusAtual">Carregando</span>
+        <h2 id="mensagemStatus">Buscando as informações do seu pedido</h2>
+        <p id="nomeEmpresa">Restaurante</p>
+      </div>
+      <div class="eta"><small>PREVISÃO</small><strong id="previsao">—</strong></div>
+    </section>
+
+    <section class="track-card live-map-card" id="mapaEntrega" hidden>
+      <div class="card-title-row"><div><span class="section-kicker">LOCALIZAÇÃO AO VIVO</span><h2>Seu entregador está a caminho</h2></div><span class="map-updated" id="mapaAtualizado">Atualizando...</span></div>
+      <iframe id="mapaFrame" title="Localização aproximada do entregador" loading="lazy" referrerpolicy="no-referrer"></iframe>
+      <p>A posição é aproximada e atualizada enquanto o entregador está com o painel aberto.</p>
+    </section>
+
+    <section class="track-card progress-card">
+      <h2>Andamento do pedido</h2>
+      <ol class="timeline" id="timeline">
+        <li data-status="recebido"><span>1</span><div><strong>Pedido recebido</strong><small>O restaurante recebeu sua solicitação.</small></div></li>
+        <li data-status="preparando"><span>2</span><div><strong>Em preparação</strong><small>Seu pedido está sendo preparado.</small></div></li>
+        <li data-status="saiu_para_entrega"><span>3</span><div><strong>Saiu para entrega</strong><small>O entregador está a caminho.</small></div></li>
+        <li data-status="entregue"><span>4</span><div><strong>Pedido entregue</strong><small>Bom apetite!</small></div></li>
+      </ol>
+      <div class="cancelado" id="cancelado" hidden>Este pedido foi cancelado.</div>
+    </section>
+
+    <div class="track-grid">
+      <section class="track-card receipt-card" aria-labelledby="tituloRecibo">
+        <div class="card-title-row">
+          <div><span class="section-kicker">RECIBO</span><h2 id="tituloRecibo">Resumo do pedido</h2></div>
+          <button id="imprimirRecibo" class="icon-action" type="button" aria-label="Imprimir ou salvar recibo">🖨️</button>
+        </div>
+        <div id="itensPedido" class="itens"><p>Carregando itens...</p></div>
+        <div class="receipt-totals">
+          <div><span>Subtotal</span><strong id="subtotalPedido">R$ 0,00</strong></div>
+          <div><span>Taxa de entrega</span><strong id="taxaPedido">R$ 0,00</strong></div>
+          <div id="cupomLinha" hidden><span>Cupom <b id="cupomPedido"></b></span><strong>Aplicado</strong></div>
+          <div class="discount-row" id="descontoLinha" hidden><span>Desconto</span><strong id="descontoPedido">− R$ 0,00</strong></div>
+          <div class="receipt-total"><span>Total</span><strong id="totalPedido">R$ 0,00</strong></div>
+        </div>
+        <div class="order-note" id="observacoesLinha" hidden>
+          <small>OBSERVAÇÕES DO PEDIDO</small>
+          <p id="observacoesPedido"></p>
+        </div>
+      </section>
+
+      <section class="track-card delivery-card">
+        <span class="section-kicker">DETALHES</span>
+        <h2>Entrega e pagamento</h2>
+        <dl>
+          <div><dt>Endereço</dt><dd id="enderecoPedido">—</dd></div>
+          <div><dt>Pagamento</dt><dd id="pagamentoPedido">—</dd></div>
+          <div><dt>Realizado em</dt><dd id="dataPedido">—</dd></div>
+        </dl>
+        <button id="ativarNotificacoes" class="btn-outline" type="button">🔔 Ativar notificações</button>
+        <button id="pagarOnline" class="btn-payment" type="button" hidden>💳 Pagar online com segurança</button>
+      </section>
+    </div>
+
+    <section class="track-card chat-card" id="chatPedido">
+      <div class="card-title-row"><div><span class="section-kicker">CONVERSA DO PEDIDO</span><h2>Fale com a equipe da entrega</h2></div><span class="chat-live">● Online</span></div>
+      <div class="chat-messages" id="mensagensPedido" aria-live="polite"><p>Carregando conversa...</p></div>
+      <form class="chat-form" id="mensagemForm"><label class="sr-only" for="mensagemTexto">Mensagem</label><input id="mensagemTexto" maxlength="1000" placeholder="Digite uma mensagem sobre o pedido..." required/><button type="submit">Enviar</button></form>
+    </section>
+
+    <section class="post-order-actions" id="acoesPosPedido" hidden>
+      <div><strong>Gostou e quer repetir?</strong><span>Atualizamos preços e disponibilidade antes de montar o carrinho.</span></div>
+      <button id="pedirNovamente" type="button">Pedir novamente <span>→</span></button>
+    </section>
+
+    <section class="track-card review-card" id="avaliacao" hidden tabindex="-1">
+      <div class="review-copy">
+        <span class="section-kicker">SUA EXPERIÊNCIA</span>
+        <h2>Como foi seu pedido?</h2>
+        <p>Sua nota ajuda outras pessoas e o restaurante a melhorar.</p>
+      </div>
+      <form id="avaliacaoForm">
+        <div class="stars" id="estrelasAvaliacao" role="radiogroup" aria-label="Nota do pedido">
+          <button type="button" data-nota="1" role="radio" aria-checked="false" aria-label="1 estrela">★</button>
+          <button type="button" data-nota="2" role="radio" aria-checked="false" aria-label="2 estrelas">★</button>
+          <button type="button" data-nota="3" role="radio" aria-checked="false" aria-label="3 estrelas">★</button>
+          <button type="button" data-nota="4" role="radio" aria-checked="false" aria-label="4 estrelas">★</button>
+          <button type="button" data-nota="5" role="radio" aria-checked="false" aria-label="5 estrelas">★</button>
+        </div>
+        <p class="rating-label" id="textoNota">Selecione de 1 a 5 estrelas</p>
+        <label for="comentarioAvaliacao">Comentário <span>(opcional)</span></label>
+        <textarea id="comentarioAvaliacao" maxlength="1000" rows="4" placeholder="Conte o que mais gostou ou o que poderia melhorar..."></textarea>
+        <div class="review-footer">
+          <span id="statusAvaliacao" role="status" aria-live="polite"></span>
+          <button class="review-submit" id="salvarAvaliacao" type="submit">Enviar avaliação</button>
+        </div>
+        <div class="restaurant-response" id="respostaRestaurante" hidden><strong>Resposta do restaurante</strong><p id="textoRespostaRestaurante"></p></div>
+      </form>
+    </section>
+
+    <section class="help">
+      <div><strong>Precisa de ajuda?</strong><p>Entre em contato diretamente com o restaurante.</p><a id="telefoneEmpresa" hidden>Telefonar para o restaurante</a></div>
+      <a href="index.html">Voltar para o início</a>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/config.js?v=3.1.0"></script>
+  <script src="js/monitoring.js?v=3.1.0"></script>
+  <script src="js/notifications.js?v=3.1.0"></script>
+  <script src="js/pos-pedido.js?v=2.9.0"></script>
+<script src="js/acompanhamento.js?v=3.5.0"></script>
+  <script src="js/site-enhancements.js?v=2.6.1"></script>
+</body>
+</html>

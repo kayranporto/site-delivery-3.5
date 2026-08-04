@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#171a24"/>
+  <meta name="description" content="Gerencie pedidos, vendas e cardápio do restaurante."/>
+  <title>Painel do restaurante | Multi Delivery</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/empresa-dashboard.css?v=3.5.0"/>
+  <link rel="stylesheet" href="css/accessibility.css?v=2.6.1"/>
+  <link rel="stylesheet" href="css/enhancements.css?v=3.1.0"/>
+</head>
+<body>
+  <noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
+
+  <aside class="dashboard-sidebar" id="dashboardSidebar">
+    <a class="dashboard-brand" href="index.html" aria-label="Multi Delivery">
+      <span aria-hidden="true">🍔</span>
+      <div><strong>Multi</strong><small>RESTAURANTE</small></div>
+    </a>
+    <nav aria-label="Seções do painel">
+      <a class="active" href="#visaoGeral"><span>⌂</span> Visão geral</a>
+      <a href="#pedidos"><span>▣</span> Pedidos <b id="pedidosAtivosMenu">0</b></a>
+      <a href="#cardapio"><span>☷</span> Cardápio</a>
+      <a href="#personalizacoes"><span>✦</span> Personalizações</a>
+      <a href="#promocoes"><span>%</span> Promoções</a>
+      <a href="#avaliacoes"><span>★</span> Avaliações</a>
+      <a href="#operacao"><span>◷</span> Operação</a>
+      <a href="#financeiro"><span>R$</span> Financeiro</a>
+      <a href="#configuracoes"><span>⚙</span> Configurações</a>
+    </nav>
+    <div class="sidebar-footer">
+      <p>Precisa conferir a experiência do cliente?</p>
+      <a id="linkLoja" href="index.html">Abrir minha loja <span>↗</span></a>
+    </div>
+  </aside>
+
+  <div class="dashboard-shell">
+    <header class="dashboard-header">
+      <button class="menu-toggle" id="menuDashboard" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+      <div class="header-copy">
+        <span>PAINEL DO RESTAURANTE</span>
+        <h1 id="nomeEmpresa">Carregando restaurante...</h1>
+      </div>
+      <div class="header-actions">
+        <button class="alert-button" id="ativarAlertas" type="button" aria-pressed="false">
+          <span aria-hidden="true">🔔</span><span class="alert-label">Ativar alertas</span>
+        </button>
+        <button class="logout-button" id="logoutEmpresa" type="button">Sair</button>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <section class="approval-alert" id="publicacaoAviso" hidden role="status">
+        <span aria-hidden="true">⏳</span>
+        <div><strong>Loja aguardando aprovação</strong><p>Complete o cardápio e as configurações enquanto a análise administrativa é concluída.</p></div>
+      </section>
+
+      <section class="overview-hero" id="visaoGeral">
+        <div class="overview-copy">
+          <span class="eyebrow">OPERAÇÃO EM TEMPO REAL</span>
+          <h2>Olá! Vamos acompanhar as vendas de hoje?</h2>
+          <p>Pedidos, faturamento e desempenho atualizados em um único painel.</p>
+        </div>
+        <div class="store-control">
+          <div><small>STATUS DA LOJA</small><strong id="textoStatusLoja">Carregando...</strong></div>
+          <label class="store-switch"><input disabled id="statusEmpresa" type="checkbox"/><span></span><em>Receber pedidos</em></label>
+        </div>
+      </section>
+
+      <div class="dashboard-toolbar">
+        <div><span class="live-dot"></span><strong>Dados atualizados</strong><small id="ultimaAtualizacao">agora</small></div>
+        <label>Período
+          <select id="filtroPeriodo">
+            <option value="hoje">Hoje</option>
+            <option value="7d">Últimos 7 dias</option>
+            <option value="30d">Últimos 30 dias</option>
+            <option value="todos">Todo o período</option>
+          </select>
+        </label>
+      </div>
+
+      <section class="metrics-grid" aria-label="Indicadores da loja">
+        <article class="metric-card red"><span class="metric-icon">▣</span><div><small>Pedidos</small><strong id="totalPedidos">0</strong><p>no período escolhido</p></div></article>
+        <article class="metric-card orange"><span class="metric-icon">◷</span><div><small>Em andamento</small><strong id="pedidosAtivos">0</strong><p>precisam de atenção</p></div></article>
+        <article class="metric-card green"><span class="metric-icon">R$</span><div><small>Faturamento</small><strong id="faturamento">R$ 0,00</strong><p>entregues e pagos</p></div></article>
+        <article class="metric-card blue"><span class="metric-icon">↗</span><div><small>Ticket médio</small><strong id="ticketMedio">R$ 0,00</strong><p>por venda concluída</p></div></article>
+        <article class="metric-card purple"><span class="metric-icon">☷</span><div><small>Produtos</small><strong id="totalProdutos">0</strong><p id="produtosDisponiveis">0 disponíveis</p></div></article>
+      </section>
+
+      <section class="analytics-grid">
+        <article class="dashboard-card sales-chart-card">
+          <div class="section-heading"><div><span class="section-kicker">DESEMPENHO</span><h2>Vendas no período</h2></div><strong id="vendasChartResumo">R$ 0,00</strong></div>
+          <div class="sales-chart" id="vendasChart" role="img" aria-label="Gráfico de faturamento por período"><div class="chart-loading">Calculando vendas...</div></div>
+        </article>
+        <article class="dashboard-card top-products-card">
+          <div class="section-heading"><div><span class="section-kicker">CARDÁPIO</span><h2>Mais vendidos</h2></div><span>Top 5</span></div>
+          <div class="top-products" id="produtosMaisVendidos"><div class="chart-loading">Calculando produtos...</div></div>
+        </article>
+      </section>
+
+      <section class="orders-section" id="pedidos">
+        <div class="section-heading orders-title">
+          <div><span class="section-kicker">OPERAÇÃO</span><h2>Pedidos em tempo real</h2><p>Avance os cartões conforme o preparo e a entrega.</p></div>
+          <button class="refresh-button" id="atualizarPedidos" type="button">↻ Atualizar</button>
+        </div>
+        <div class="order-filters">
+          <label class="search-field"><span>⌕</span><input id="buscaPedido" type="search" placeholder="Buscar número, cliente ou item" maxlength="100"/></label>
+          <label>Status
+            <select id="filtroStatusPedido">
+              <option value="todos">Todos</option>
+              <option value="recebido">Recebidos</option>
+              <option value="preparando">Preparando</option>
+              <option value="saiu_para_entrega">Em entrega</option>
+              <option value="entregue">Entregues</option>
+              <option value="cancelado">Cancelados</option>
+            </select>
+          </label>
+        </div>
+        <div class="kanban" id="pedidosEmpresa" aria-live="polite"><div class="panel-loading">Carregando pedidos...</div></div>
+      </section>
+
+      <section class="management-section" id="cardapio">
+        <div class="section-heading"><div><span class="section-kicker">GESTÃO</span><h2>Cardápio</h2><p>Organize categorias e mantenha seus produtos atualizados.</p></div></div>
+        <div class="management-grid">
+          <article class="dashboard-card">
+            <h3>Categorias</h3>
+            <form class="inline-form" id="categoriaForm">
+              <div class="field"><label for="novaCategoria">Nome da categoria</label><input id="novaCategoria" maxlength="80" placeholder="Ex.: Hambúrgueres" required/></div>
+              <button class="btn" type="submit">Adicionar</button>
+            </form>
+            <div class="chips-admin" id="categoriasEmpresa" aria-live="polite"></div>
+          </article>
+          <article class="dashboard-card">
+            <h3 id="produtoFormTitulo">Novo produto</h3>
+            <form id="produtoForm">
+              <div class="grid">
+                <div class="field"><label for="produtoNome">Nome</label><input id="produtoNome" maxlength="120" required/></div>
+                <div class="field"><label for="produtoCategoria">Categoria</label><select id="produtoCategoria"><option value="">Sem categoria</option></select></div>
+                <div class="field"><label for="produtoPreco">Preço</label><input id="produtoPreco" min="0" required step="0.01" type="number"/></div>
+                <div class="field"><label for="produtoPromocao">Preço promocional</label><input id="produtoPromocao" min="0" placeholder="Opcional" step="0.01" type="number"/></div>
+                <div class="field"><label for="produtoEstoque">Estoque atual</label><input id="produtoEstoque" min="0" step="1" value="0" type="number"/></div>
+                <div class="field"><label for="produtoEstoqueMinimo">Alerta de estoque baixo</label><input id="produtoEstoqueMinimo" min="0" step="1" value="5" type="number"/></div>
+                <div class="field field-wide"><label for="produtoDescricao">Descrição</label><textarea id="produtoDescricao" maxlength="500" rows="3"></textarea></div>
+                <div class="field field-wide media-upload" data-media-upload data-media-target="produtoImagem" data-media-key="produto" data-media-ratio="square">
+                  <label for="produtoImagemArquivo">Foto do produto</label>
+                  <div class="media-upload-row"><img alt="Prévia do produto" hidden/><div><input id="produtoImagem" type="hidden"/><input id="produtoImagemArquivo" type="file" accept="image/jpeg,image/png,image/webp"/><small data-media-status>JPG, PNG ou WEBP. A foto será recortada e otimizada.</small><button class="btn-mini perigo" data-media-remove type="button" hidden>Remover foto</button></div></div>
+                </div>
+              </div>
+              <label class="checkbox-admin"><input checked id="produtoDisponivel" type="checkbox"/> Produto disponível</label>
+              <label class="checkbox-admin"><input id="produtoControlaEstoque" type="checkbox"/> Baixar estoque automaticamente a cada pedido</label>
+              <button class="btn" id="produtoSalvar" type="submit">Cadastrar produto</button>
+            </form>
+          </article>
+        </div>
+        <article class="dashboard-card products-table-card">
+          <div class="section-heading"><h3>Produtos cadastrados</h3><span id="resumoProdutos">0 produtos</span></div>
+          <div class="table-wrap"><table><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Disponível</th><th>Ações</th></tr></thead><tbody id="produtosEmpresa"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="management-section" id="personalizacoes">
+        <div class="section-heading"><div><span class="section-kicker">EXTRAS</span><h2>Adicionais e personalizações</h2><p>Crie escolhas e vincule-as aos produtos.</p></div></div>
+        <article class="dashboard-card">
+          <div class="personalization-grid">
+            <form id="grupoAdicionalForm">
+              <h3>Novo grupo</h3>
+              <div class="grid"><div class="field field-wide"><label for="grupoNome">Nome</label><input id="grupoNome" maxlength="80" placeholder="Ex.: Escolha o molho" required/></div><div class="field"><label for="grupoMinimo">Mínimo</label><input id="grupoMinimo" min="0" max="20" value="0" type="number" required/></div><div class="field"><label for="grupoMaximo">Máximo</label><input id="grupoMaximo" min="1" max="20" value="1" type="number" required/></div></div>
+              <button class="btn" type="submit">Criar grupo</button>
+            </form>
+            <form id="adicionalForm">
+              <h3>Novo adicional</h3>
+              <div class="grid"><div class="field field-wide"><label for="adicionalGrupo">Grupo</label><select id="adicionalGrupo" required><option value="">Crie um grupo primeiro</option></select></div><div class="field"><label for="adicionalNome">Nome</label><input id="adicionalNome" maxlength="80" placeholder="Ex.: Molho especial" required/></div><div class="field"><label for="adicionalPreco">Preço</label><input id="adicionalPreco" min="0" step="0.01" value="0" type="number" required/></div></div>
+              <button class="btn" type="submit">Adicionar opção</button>
+            </form>
+          </div>
+          <form class="link-form" id="vinculoGrupoForm"><div class="field"><label for="vinculoProduto">Produto</label><select id="vinculoProduto" required><option value="">Selecione</option></select></div><div class="field"><label for="vinculoGrupo">Grupo de adicionais</label><select id="vinculoGrupo" required><option value="">Selecione</option></select></div><button class="btn" type="submit">Vincular</button></form>
+          <div class="groups-list" id="gruposAdicionaisEmpresa" aria-live="polite"><div class="empty">Carregando grupos...</div></div>
+        </article>
+      </section>
+
+      <section class="management-section" id="promocoes">
+        <div class="section-heading"><div><span class="section-kicker">CAMPANHAS</span><h2>Promoções e cupons</h2><p>Crie benefícios com validade, limite por cliente e teto de desconto.</p></div></div>
+        <div class="management-grid">
+          <article class="dashboard-card">
+            <h3>Novo cupom</h3>
+            <form id="cupomForm">
+              <div class="grid">
+                <div class="field"><label for="cupomCodigo">Código</label><input id="cupomCodigo" maxlength="30" placeholder="EX.: PIZZA20" required/></div>
+                <div class="field"><label for="cupomTipo">Benefício</label><select id="cupomTipo"><option value="percentual">Percentual</option><option value="fixo">Valor fixo</option><option value="frete">Frete grátis</option></select></div>
+                <div class="field"><label for="cupomValor">Valor</label><input id="cupomValor" type="number" min="0" max="10000" step="0.01" value="10" required/></div>
+                <div class="field"><label for="cupomMinimo">Pedido mínimo</label><input id="cupomMinimo" type="number" min="0" step="0.01" value="0" required/></div>
+                <div class="field"><label for="cupomMaximo">Teto do desconto</label><input id="cupomMaximo" type="number" min="0" step="0.01" placeholder="Opcional"/></div>
+                <div class="field"><label for="cupomLimite">Limite total de usos</label><input id="cupomLimite" type="number" min="1" placeholder="Sem limite"/></div>
+                <div class="field"><label for="cupomPorUsuario">Usos por cliente</label><input id="cupomPorUsuario" type="number" min="1" max="100" value="1" required/></div>
+                <div class="field"><label for="cupomFim">Válido até</label><input id="cupomFim" type="datetime-local"/></div>
+              </div>
+              <label class="checkbox-admin"><input id="cupomPrimeiro" type="checkbox"/> Somente no primeiro pedido</label>
+              <button class="btn" type="submit">Criar promoção</button>
+            </form>
+          </article>
+          <article class="dashboard-card"><h3>Cupons ativos e pausados</h3><div class="promo-list" id="cuponsEmpresa"><p class="empty">Carregando promoções...</p></div></article>
+        </div>
+      </section>
+
+      <section class="management-section" id="avaliacoes">
+        <div class="section-heading"><div><span class="section-kicker">REPUTAÇÃO</span><h2>Avaliações dos clientes</h2><p>Leia os comentários e responda publicamente com atenção.</p></div><strong id="mediaAvaliacoes">—</strong></div>
+        <div class="reviews-admin" id="avaliacoesEmpresa"><p class="empty">Carregando avaliações...</p></div>
+      </section>
+
+      <section class="management-section operation-section" id="operacao">
+        <div class="section-heading"><div><span class="section-kicker">OPERAÇÃO REAL</span><h2>Horários, pausas e regiões</h2><p>Automatize a disponibilidade da loja e cobre a entrega correta para cada bairro.</p></div><span class="operation-live" id="operacaoStatus">Verificando operação...</span></div>
+        <div class="operation-grid">
+          <article class="dashboard-card operation-card">
+            <h3>Horários de funcionamento</h3>
+            <p class="card-help">Marque os dias atendidos. Horários que atravessam a meia-noite também são aceitos.</p>
+            <form id="horariosForm"><div class="hours-list" id="horariosEmpresa"></div><button class="btn" type="submit">Salvar horários</button></form>
+          </article>
+          <article class="dashboard-card operation-card">
+            <h3>Pausas programadas</h3>
+            <p class="card-help">Use para feriados, manutenção ou indisponibilidade temporária.</p>
+            <form id="pausaForm" class="grid"><div class="field"><label for="pausaInicio">Início</label><input id="pausaInicio" type="datetime-local" required/></div><div class="field"><label for="pausaFim">Fim</label><input id="pausaFim" type="datetime-local" required/></div><div class="field field-wide"><label for="pausaMotivo">Motivo</label><input id="pausaMotivo" maxlength="160" placeholder="Ex.: feriado municipal"/></div><button class="btn" type="submit">Programar pausa</button></form>
+            <div class="operation-list" id="pausasEmpresa"><p class="empty">Nenhuma pausa programada.</p></div>
+          </article>
+        </div>
+        <article class="dashboard-card operation-card">
+          <div class="section-heading"><div><h3>Regiões de entrega</h3><p>Se houver ao menos uma região ativa, somente os bairros cadastrados poderão pedir.</p></div></div>
+          <form id="regiaoForm" class="region-form"><div class="field"><label for="regiaoBairro">Bairro</label><input id="regiaoBairro" maxlength="100" required/></div><div class="field"><label for="regiaoCidade">Cidade</label><input id="regiaoCidade" maxlength="100" required/></div><div class="field"><label for="regiaoUf">UF</label><input id="regiaoUf" maxlength="2" pattern="[A-Za-z]{2}" required/></div><div class="field"><label for="regiaoTaxa">Taxa</label><input id="regiaoTaxa" min="0" step="0.01" value="0" type="number" required/></div><div class="field"><label for="regiaoMinimo">Pedido mínimo</label><input id="regiaoMinimo" min="0" step="0.01" value="0" type="number" required/></div><div class="field"><label for="regiaoTempoMin">Previsão mín.</label><input id="regiaoTempoMin" min="5" max="240" value="25" type="number" required/></div><div class="field"><label for="regiaoTempoMax">Previsão máx.</label><input id="regiaoTempoMax" min="5" max="300" value="45" type="number" required/></div><button class="btn" type="submit">Adicionar região</button></form>
+          <div class="region-list" id="regioesEmpresa"><p class="empty">Nenhuma região específica cadastrada.</p></div>
+        </article>
+        <div class="operation-grid">
+          <article class="dashboard-card operation-card">
+            <h3>Solicitações de cancelamento</h3><p class="card-help">Analise os pedidos antes de aprovar. Pagamentos online confirmados entram na fila de reembolso.</p>
+            <div class="operation-list" id="cancelamentosEmpresa"><p class="empty">Nenhuma solicitação pendente.</p></div>
+          </article>
+          <article class="dashboard-card operation-card">
+            <h3>Programa de fidelidade</h3><p class="card-help">Os pontos são creditados automaticamente quando o pedido é entregue.</p>
+            <form id="fidelidadeForm" class="grid"><label class="checkbox-admin field-wide"><input id="fidelidadeAtiva" type="checkbox"/> Programa ativo</label><div class="field"><label for="pontosPorReal">Pontos por R$ 1</label><input id="pontosPorReal" min="0.01" step="0.01" value="1" type="number" required/></div><div class="field"><label for="pontosBeneficio">Meta de pontos</label><input id="pontosBeneficio" min="1" value="500" type="number" required/></div><div class="field field-wide"><label for="valorBeneficio">Valor do benefício</label><input id="valorBeneficio" min="0.01" step="0.01" value="20" type="number" required/></div><button class="btn" type="submit">Salvar fidelidade</button></form>
+          </article>
+        </div>
+      </section>
+
+      <section class="management-section" id="financeiro">
+        <div class="section-heading"><div><span class="section-kicker">FINANCEIRO</span><h2>Resumo de repasses</h2><p>Acompanhe vendas, taxa da plataforma, saldo líquido e pendências.</p></div><label class="finance-period">Período <select id="financeiroPeriodo"><option value="7">7 dias</option><option value="30" selected>30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option></select></label></div>
+        <div class="finance-grid" id="financeiroResumo"><article><small>Vendas brutas</small><strong id="financeBruto">R$ 0,00</strong></article><article><small>Taxa da plataforma</small><strong id="financeTaxa">R$ 0,00</strong></article><article class="highlight"><small>Saldo líquido estimado</small><strong id="financeLiquido">R$ 0,00</strong></article><article><small>Online pendente</small><strong id="financePendente">R$ 0,00</strong></article><article><small>Reembolsos pendentes</small><strong id="financeReembolsos">0</strong></article><article><small>Pedidos entregues</small><strong id="financeEntregues">0</strong></article></div>
+        <p class="finance-note" id="financeNota">Valores estimados; a conciliação final depende do provedor de pagamento.</p>
+      </section>
+
+      <section class="management-section" id="configuracoes">
+        <div class="section-heading"><div><span class="section-kicker">SUA LOJA</span><h2>Configurações</h2><p>Defina atendimento, entrega e identidade visual.</p></div></div>
+        <article class="dashboard-card settings-card">
+          <form id="lojaForm">
+            <div class="grid">
+              <div class="field"><label for="lojaNome">Nome</label><input autocomplete="organization" id="lojaNome" maxlength="100" required/></div>
+              <div class="field"><label for="lojaTelefone">Telefone</label><input autocomplete="tel" id="lojaTelefone" maxlength="30"/></div>
+              <div class="field"><label for="lojaCategoria">Categoria</label><input id="lojaCategoria" maxlength="80" placeholder="Ex.: Pizza, Lanches"/></div>
+              <div class="field"><label for="lojaTaxa">Taxa de entrega</label><input id="lojaTaxa" min="0" required step="0.01" type="number"/></div>
+              <div class="field"><label for="lojaMinimo">Pedido mínimo</label><input id="lojaMinimo" min="0" required step="0.01" type="number"/></div>
+              <div class="field"><label for="lojaCidade">Cidade atendida</label><input autocomplete="address-level2" id="lojaCidade" maxlength="100"/></div>
+              <div class="field"><label for="lojaUf">UF</label><input autocomplete="address-level1" id="lojaUf" maxlength="2" pattern="[A-Za-z]{2}" placeholder="SP"/></div>
+              <div class="field"><label for="lojaTempoMin">Previsão mínima</label><input id="lojaTempoMin" min="5" max="240" required type="number"/></div>
+              <div class="field"><label for="lojaTempoMax">Previsão máxima</label><input id="lojaTempoMax" min="5" max="360" required type="number"/></div>
+              <div class="field field-wide"><label for="lojaBairros">Bairros atendidos</label><textarea id="lojaBairros" maxlength="1000" rows="3" placeholder="Um bairro por linha"></textarea></div>
+              <div class="field field-wide"><label for="lojaDescricao">Descrição</label><textarea id="lojaDescricao" maxlength="500" rows="3"></textarea></div>
+              <div class="field field-wide media-upload" data-media-upload data-media-target="lojaLogo" data-media-key="logo" data-media-ratio="square">
+                <label for="lojaLogoArquivo">Logotipo da loja</label><div class="media-upload-row"><img alt="Prévia do logotipo" hidden/><div><input id="lojaLogo" type="hidden"/><input id="lojaLogoArquivo" type="file" accept="image/jpeg,image/png,image/webp"/><small data-media-status>Imagem quadrada recomendada.</small><button class="btn-mini perigo" data-media-remove type="button" hidden>Remover logotipo</button></div></div>
+              </div>
+              <div class="field field-wide media-upload" data-media-upload data-media-target="lojaBanner" data-media-key="banner" data-media-ratio="banner">
+                <label for="lojaBannerArquivo">Banner da loja</label><div class="media-upload-row banner"><img alt="Prévia do banner" hidden/><div><input id="lojaBanner" type="hidden"/><input id="lojaBannerArquivo" type="file" accept="image/jpeg,image/png,image/webp"/><small data-media-status>Formato panorâmico; recorte automático.</small><button class="btn-mini perigo" data-media-remove type="button" hidden>Remover banner</button></div></div>
+              </div>
+            </div>
+            <button class="btn" type="submit">Salvar configurações</button>
+          </form>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/media-uploader.js?v=3.4.0"></script>
+  <script src="js/config.js?v=3.1.0"></script>
+  <script src="js/monitoring.js?v=3.1.0"></script>
+  <script src="js/notifications.js?v=3.1.0"></script>
+  <script src="js/empresa-dashboard.js?v=3.5.0"></script>
+  <script src="js/operacao-empresa.js?v=3.5.0"></script>
+  <script src="js/site-enhancements.js?v=2.6.1"></script>
+</body>
+</html>

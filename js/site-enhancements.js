@@ -1,0 +1,13 @@
+"use strict";
+(() => {
+  const region=document.createElement("div"); region.className="app-toast-region"; region.setAttribute("aria-live","polite"); document.body.append(region);
+  function toast(titulo,mensagem="",tipo="info",tempo=4500){const el=document.createElement("div");el.className=`app-toast ${tipo}`;const box=document.createElement("div");const strong=document.createElement("strong");strong.textContent=titulo;const p=document.createElement("p");p.textContent=mensagem;box.append(strong);if(mensagem)box.append(p);const close=document.createElement("button");close.type="button";close.setAttribute("aria-label","Fechar aviso");close.textContent="×";close.onclick=()=>el.remove();el.append(box,close);region.append(el);if(tempo)setTimeout(()=>el.remove(),tempo);return el}
+  window.AppToast=toast;
+  const net=document.createElement("div");net.className="network-banner";net.setAttribute("role","status");document.body.append(net);
+  function status(online,initial=false){net.textContent=online?"Conexão restabelecida":"Você está offline. Alguns dados podem estar desatualizados.";net.className=`network-banner show${online?" online":""}`;if(online&&!initial)setTimeout(()=>net.classList.remove("show"),2600);}
+  addEventListener("online",()=>status(true));addEventListener("offline",()=>status(false));if(!navigator.onLine)status(false,true);
+  if("serviceWorker" in navigator && location.protocol!=="file:") addEventListener("load",()=>navigator.serviceWorker.register("./sw.js?v=2.6.1").then(registro=>registro.update()).catch(err=>console.warn("Service Worker:",err)));
+  let installPrompt=null;const install=document.createElement("button");install.className="install-app";install.type="button";install.hidden=true;install.textContent="Instalar aplicativo";document.body.append(install);
+  addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;install.hidden=false});install.onclick=async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;install.hidden=true;installPrompt=null};addEventListener("appinstalled",()=>{install.hidden=true;toast("Aplicativo instalado","O Multi Delivery foi adicionado ao seu dispositivo.","success")});
+  if(!document.querySelector(".skip-link")){const skip=document.createElement("a");skip.className="skip-link";skip.href="#conteudoPrincipal";skip.textContent="Pular para o conteúdo";skip.onclick=e=>{e.preventDefault();const main=document.querySelector("main,.page-main");if(!main)return;main.id=main.id||"conteudoPrincipal";main.setAttribute("tabindex","-1");main.focus()};document.body.prepend(skip)}
+})();
