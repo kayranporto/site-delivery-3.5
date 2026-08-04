@@ -1,0 +1,160 @@
+"use strict";
+
+(function iniciarPosPedido() {
+    function chaveProduto(produto) {
+        const adicionais = (produto.adicionais || [])
+            .map((item) => String(item.id))
+            .sort()
+            .join("-");
+        return `${produto.id}|${adicionais}|${produto.observacao || ""}`;
+    }
+
+    function alterarBotao(botao, carregando) {
+        if (!botao) return;
+        if (carregando) {
+            botao.dataset.textoOriginal = botao.textContent;
+            botao.textContent = "Montando carrinho...";
+            botao.disabled = true;
+        } else {
+            botao.textContent = botao.dataset.textoOriginal || "Pedir novamente";
+            botao.disabled = false;
+        }
+    }
+
+    async function pedirNovamente(pedido, botao) {
+        if (!pedido?.empresa_id || !Array.isArray(pedido.pedido_itens) || !pedido.pedido_itens.length) {
+            alert("Não foi possível recuperar os itens deste pedido.");
+            return;
+        }
+
+        const carrinhoExistente = App.lerJSON("carrinho", []);
+        if (Array.isArray(carrinhoExistente) && carrinhoExistente.length) {
+            const substituir = confirm("Pedir novamente substituirá os itens que já estão no carrinho. Deseja continuar?");
+            if (!substituir) return;
+        }
+
+        alterarBotao(botao, true);
+
+        try {
+            const produtoIds = [...new Set(pedido.pedido_itens
+                .map((item) => String(item?.produto_id || ""))
+                .filter(Boolean))];
+            const adicionalIds = [...new Set(pedido.pedido_itens
+                .flatMap((item) => Array.isArray(item?.adicionais) ? item.adicionais : [])
+                .map((adicional) => String(adicional?.id || ""))
+                .filter(Boolean))];
+
+            const [empresaResposta, produtosResposta, adicionaisResposta, vinculosResposta] = await Promise.all([
+                db.from("empresas_catalogo")
+                    .select("id,nome,taxa_entrega,pedido_minimo,status,cidade_atendimento,uf_atendimento,bairros_atendidos,tempo_estimado_min,tempo_estimado_max")
+                    .eq("id", String(pedido.empresa_id))
+                    .maybeSingle(),
+                produtoIds.length
+                    ? db.from("produtos")
+                        .select("id,nome,imagem,preco,promocao,disponivel")
+                        .in("id", produtoIds)
+                    : Promise.resolve({ data: [], error: null }),
+                adicionalIds.length
+                    ? db.from("adicionais")
+                        .select("id,grupo_id,nome,preco,ativo")
+                        .in("id", adicionalIds)
+                    : Promise.resolve({ data: [], error: null }),
+                produtoIds.length
+                    ? db.from("produto_grupos")
+                        .select("produto_id,grupo_id")
+                        .in("produto_id", produtoIds)
+                    : Promise.resolve({ data: [], error: null })
+            ]);
+
+            if (empresaResposta.error) throw empresaResposta.error;
+            if (produtosResposta.error) throw produtosResposta.error;
+            if (adicionaisResposta.error) throw adicionaisResposta.error;
+            if (vinculosResposta.error) throw vinculosResposta.error;
+            if (!empresaResposta.data) throw new Error("O restaurante não está disponível no catálogo.");
+
+            const empresa = empresaResposta.data;
+            if (empresa.status === false) {
+                alert("Este restaurante está fechado agora. Você poderá repetir o pedido quando ele voltar a receber pedidos.");
+                return;
+            }
+
+            const produtos = new Map((produtosResposta.data || []).map((produto) => [String(produto.id), produto]));
+            const adicionais = new Map((adicionaisResposta.data || []).map((adicional) => [String(adicional.id), adicional]));
+            const vinculos = new Set((vinculosResposta.data || [])
+                .map((vinculo) => `${String(vinculo.produto_id)}|${String(vinculo.grupo_id)}`));
+            let itensIgnorados = 0;
+
+            const carrinho = pedido.pedido_itens.flatMap((item) => {
+                const produto = produtos.get(String(item?.produto_id || ""));
+                if (!produto || produto.disponivel === false) {
+                    itensIgnorados += 1;
+                    return [];
+                }
+
+                const extras = (Array.isArray(item.adicionais) ? item.adicionais : []).flatMap((adicionalAntigo) => {
+                    const adicional = adicionais.get(String(adicionalAntigo?.id || ""));
+                    const pertenceAoProduto = adicional && vinculos.has(`${String(produto.id)}|${String(adicional.grupo_id)}`);
+                    if (!adicional || adicional.ativo === false || !pertenceAoProduto) return [];
+                    return [{
+                        id: String(adicional.id),
+                        nome: adicional.nome || adicionalAntigo.nome || "Adicional",
+                        preco: Number(adicional.preco || 0)
+                    }];
+                });
+
+                const promocao = Number(produto.promocao || 0);
+                const novoItem = {
+                    id: String(produto.id),
+                    nome: produto.nome || item.nome_produto || "Produto",
+                    imagem: produto.imagem || "assets/produto-padrao.svg",
+                    preco: promocao > 0 ? promocao : Number(produto.preco || 0),
+                    quantidade: Math.min(99, Math.max(1, Number.parseInt(item.quantidade, 10) || 1)),
+                    observacao: String(item.observacao || "").trim().slice(0, 300),
+                    adicionais: extras,
+                    empresa_id: String(empresa.id)
+                };
+                novoItem.chave = chaveProduto(novoItem);
+                return [novoItem];
+            });
+
+            if (!carrinho.length) {
+                alert("Os itens deste pedido não estão mais disponíveis. Abriremos o cardápio para você escolher outras opções.");
+                location.href = `restaurante.html?id=${encodeURIComponent(empresa.id)}`;
+                return;
+            }
+
+            const meta = {
+                empresa_id: String(empresa.id),
+                empresa_nome: empresa.nome || pedido.empresa_nome || "Restaurante",
+                taxa_entrega: Number(empresa.taxa_entrega || 0),
+                pedido_minimo: Number(empresa.pedido_minimo || 0),
+                status: empresa.status !== false,
+                cidade_atendimento: empresa.cidade_atendimento || null,
+                uf_atendimento: empresa.uf_atendimento || null,
+                bairros_atendidos: Array.isArray(empresa.bairros_atendidos) ? empresa.bairros_atendidos : [],
+                tempo_estimado_min: Number(empresa.tempo_estimado_min || 25),
+                tempo_estimado_max: Number(empresa.tempo_estimado_max || 45)
+            };
+
+            App.salvarJSON("carrinho", carrinho);
+            App.salvarJSON("carrinhoMeta", meta);
+            App.salvarJSON("empresaAtual", meta);
+            localStorage.setItem("ultimaPaginaRestaurante", `restaurante.html?id=${encodeURIComponent(empresa.id)}`);
+
+            if (itensIgnorados) {
+                sessionStorage.setItem(
+                    "avisoCarrinho",
+                    `${itensIgnorados} ${itensIgnorados === 1 ? "item indisponível foi removido" : "itens indisponíveis foram removidos"} do pedido repetido.`
+                );
+            }
+            location.href = "checkout.html";
+        } catch (error) {
+            console.error("Erro ao repetir pedido:", error);
+            alert(`Não foi possível repetir o pedido agora. ${App.mensagemErro(error)}`);
+        } finally {
+            alterarBotao(botao, false);
+        }
+    }
+
+    window.PosPedido = Object.freeze({ pedirNovamente });
+})();

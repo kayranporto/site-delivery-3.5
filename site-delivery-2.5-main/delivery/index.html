@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  
+  <title>Delivery — Peça sua comida favorita</title>
+  <meta content="Peça comida dos melhores restaurantes da sua cidade, acompanhe seu pedido e receba onde estiver." name="description"/>
+  
+  <!-- Open Graph / Redes Sociais (WhatsApp, Facebook, etc) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Delivery — Peça sua comida favorita" />
+  <meta property="og:description" content="Peça comida dos melhores restaurantes da sua cidade, acompanhe seu pedido e receba onde estiver." />
+  <meta property="og:image" content="assets/banner1.svg" /> <!-- Troque por uma imagem JPG/PNG maior para redes sociais futuramente -->
+  <meta property="og:locale" content="pt_BR"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="canonical" href="https://kayranporto.github.io/site-delivery-2.5/delivery/"/>
+  
+  <!-- Preload da imagem principal (Melhora a nota do Google Lighthouse) -->
+  <link rel="preload" href="assets/banner1.svg" as="image" />
+
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  
+  <link href="css/style.css?v=3.4.0" rel="stylesheet"/>
+  <link href="css/accessibility.css?v=2.6.1" rel="stylesheet"/>
+  <link href="css/enhancements.css?v=3.4.0" rel="stylesheet"/>
+  
+  <link href="assets/favicon.svg" rel="icon" type="image/svg+xml"/>
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#ea1d2c">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"Multi Delivery","url":"https://kayranporto.github.io/site-delivery-2.5/delivery/","description":"Plataforma de delivery com restaurantes, pedidos e acompanhamento em tempo real.","inLanguage":"pt-BR","publisher":{"@type":"Organization","name":"Multi Delivery","logo":{"@type":"ImageObject","url":"https://kayranporto.github.io/site-delivery-2.5/delivery/assets/favicon.svg"}}}
+  </script>
+</head>
+<body class="home-page">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span>🚀 Entrega rápida na sua região</span>
+      <span class="topbar-note">Primeiro pedido com <strong>20% OFF</strong> usando BEMVINDO20</span>
+    </div>
+  </div>
+  <noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
+
+  <header class="header">
+    <div class="container-header">
+      <a class="logo" href="index.html" aria-label="Delivery — página inicial">
+        <span aria-hidden="true">🍔</span>
+        <span>Delivery</span>
+      </a>
+
+      <!-- Modificado de DIV para BUTTON para melhor acessibilidade -->
+      <button class="location" id="seletorEndereco" type="button" aria-label="Selecionar endereço de entrega">
+        <span aria-hidden="true">📍</span>
+        <span class="location-content">
+          <small>Entregar em</small>
+          <strong id="enderecoAtual">Selecionar endereço</strong>
+        </span>
+      </button>
+
+      <div class="search">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input aria-label="Buscar restaurante ou comida" autocomplete="off" id="campoBusca" maxlength="120" placeholder="Busque por prato, restaurante ou categoria" type="text"/>
+        <kbd aria-hidden="true">Ctrl K</kbd>
+      </div>
+
+      <nav id="menuUsuario" aria-label="Navegação da conta">
+        <a href="login.html">Entrar</a>
+      </nav>
+
+      <!-- Modificado de DIV para BUTTON para melhor acessibilidade -->
+      <button class="cart" id="abrirCarrinho" type="button" aria-label="Abrir carrinho">
+        🛒
+        <span class="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="banner" aria-labelledby="heroTitulo">
+      <span class="hero-orb hero-orb-one" aria-hidden="true"></span>
+      <span class="hero-orb hero-orb-two" aria-hidden="true"></span>
+      <span class="hero-orb hero-orb-three" aria-hidden="true"></span>
+      <div class="banner-content">
+        <div class="hero-copy">
+          <span class="tag"><span class="tag-pulse" aria-hidden="true"></span> Oferta relâmpago</span>
+          <h1 id="heroTitulo">Sua comida <span>favorita</span>,<br/>na sua porta.</h1>
+          <p>Dos restaurantes que você ama até a sua casa, com ofertas exclusivas e acompanhamento do pedido.</p>
+          <div class="hero-search-tags" aria-label="Buscas populares">
+            <span>Popular agora:</span>
+            <button type="button" data-search="Hambúrguer">Hambúrguer</button>
+            <button type="button" data-search="Pizza">Pizza</button>
+            <button type="button" data-search="Sushi">Sushi</button>
+          </div>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#restaurantes"><span>Ver restaurantes</span><span class="button-arrow" aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="#destaques"><span aria-hidden="true">✦</span> Explorar ofertas</a>
+          </div>
+
+          <div class="hero-trust" aria-label="Benefícios do delivery">
+            <span><strong>⚡</strong> Entrega rápida</span>
+            <span><strong>⭐</strong> Bem avaliado</span>
+            <span><strong>💳</strong> Pagamento na entrega</span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Destaque de um pedido">
+          <div class="hero-glow" aria-hidden="true"></div>
+          <div class="hero-sparkles" aria-hidden="true"><span>✦</span><span>✦</span><span>✦</span></div>
+          <img alt="Ilustração de hambúrguer para destacar uma oferta de delivery" src="assets/banner1.svg"/>
+
+          <div class="hero-deal-card">
+            <span class="deal-pill">🔥 MAIS PEDIDO</span>
+            <strong>Combo Burger Especial</strong>
+            <span class="deal-meta"><span>⭐ 4,9</span><span>•</span><span>25–35 min</span></span>
+          </div>
+
+          <div class="hero-rating-card" aria-label="Avaliação 4,9 de 5">
+            <span class="rating-star" aria-hidden="true">★</span>
+            <div><strong>4,9</strong><small>avaliação média</small></div>
+          </div>
+
+          <div class="hero-time-card" aria-label="Entrega rápida e frete grátis">
+            <span aria-hidden="true">⚡</span>
+            <div><strong>Frete grátis</strong><small>em pedidos selecionados</small></div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-stats" aria-label="Números da plataforma">
+        <div><span class="stat-icon" aria-hidden="true">🍽</span><strong>+150</strong><span>restaurantes</span></div>
+        <div><span class="stat-icon" aria-hidden="true">★</span><strong>4,9</strong><span>avaliação média</span></div>
+        <div><span class="stat-icon" aria-hidden="true">⚡</span><strong>30 min</strong><span>tempo médio</span></div>
+        <div><span class="stat-icon" aria-hidden="true">◷</span><strong>24/7</strong><span>pedidos online</span></div>
+      </div>
+    </section>
+
+    <section class="cupom" aria-labelledby="cupomTitulo">
+      <div class="cupom-box">
+        <div class="cupom-copy">
+          <span class="cupom-badge">20% OFF</span>
+          <div>
+            <h2 id="cupomTitulo">Seu primeiro pedido tem desconto</h2>
+            <p>Use o cupom <strong>BEMVINDO20</strong> e economize na sua primeira compra.</p>
+          </div>
+          <button id="copiarCupom" type="button">Copiar cupom <span aria-hidden="true">↗</span></button>
+        </div>
+        <img alt="Ilustração de cupom promocional de vinte por cento de desconto" src="assets/promo.svg"/>
+      </div>
+    </section>
+
+    <section class="categorias" aria-labelledby="categoriasTitulo">
+      <div class="section-title category-heading">
+        <div>
+          <span class="eyebrow">Escolha pelo que está com vontade</span>
+          <h2 id="categoriasTitulo">Encontre seu sabor</h2>
+        </div>
+      </div>
+
+      <div class="categoria-lista">
+        <button type="button" class="categoria" data-categoria="" aria-pressed="true">
+          <div aria-hidden="true">🍽️</div><span>Todos</span>
+        </button>
+        <button type="button" class="categoria" data-categoria="Hambúrguer">
+          <div aria-hidden="true">🍔</div><span>Hambúrguer</span>
+        </button>
+        <button type="button" class="categoria" data-categoria="Pizza">
+          <div aria-hidden="true">🍕</div><span>Pizza</span>
+        </button>
+        <button type="button" class="categoria" data-categoria="Sushi">
+          <div aria-hidden="true">🍣</div><span>Sushi</span>
+        </button>
+        <button type="button" class="categoria" data-categoria="Churrasco">
+          <div aria-hidden="true">🥩</div><span>Churrasco</span>
+        </button>
+        <button type="button" class="categoria" data-categoria="Doces">
+          <div aria-hidden="true">🍰</div><span>Doces</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="restaurantes" id="restaurantes" aria-labelledby="restaurantesTitulo">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">Perto de você</span>
+          <h2 id="restaurantesTitulo">Restaurantes em destaque</h2>
+        </div>
+        <a href="#restaurantes" id="verTodosRestaurantes">Ver todos <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="restaurant-tools" aria-label="Ferramentas de filtro e ordenação de restaurantes">
+        <button type="button" id="toggleAberto" class="filter-pill" aria-pressed="false">Aberto agora</button>
+        <button type="button" id="ordenarTaxa" class="filter-pill" aria-pressed="false">Menor taxa</button>
+        <div class="resultado-info" id="resultadoResumo" aria-live="polite">Mostrando restaurantes disponíveis.</div>
+      </div>
+      <div class="cards" id="listaRestaurantes">
+        <div class="loading">Carregando restaurantes...</div>
+      </div>
+    </section>
+
+    <section class="destaques" id="destaques" aria-labelledby="destaquesTitulo">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">Os favoritos da galera</span>
+          <h2 id="destaquesTitulo">🔥 Mais pedidos</h2>
+        </div>
+      </div>
+      <div class="produtos" id="listaProdutos"></div>
+    </section>
+
+    <section class="como-funciona" aria-labelledby="comoFuncionaTitulo">
+      <div class="section-title centered-title">
+        <div>
+          <span class="eyebrow">Simples, rápido e seguro</span>
+          <h2 id="comoFuncionaTitulo">Seu pedido em 3 passos</h2>
+        </div>
+      </div>
+      <div class="steps-grid">
+        <article class="step-card"><span class="step-number">01</span><div class="step-icon">📍</div><h3>Escolha onde entregar</h3><p>Informe seu endereço para ver restaurantes e ofertas perto de você.</p></article>
+        <article class="step-card"><span class="step-number">02</span><div class="step-icon">🍽️</div><h3>Monte seu pedido</h3><p>Escolha seus pratos favoritos, adicionais e a forma de pagamento.</p></article>
+        <article class="step-card"><span class="step-number">03</span><div class="step-icon">🛵</div><h3>Receba rapidinho</h3><p>Confirme o pedido e acompanhe tudo até chegar à sua porta.</p></article>
+      </div>
+    </section>
+
+    <section class="beneficios" aria-label="Vantagens do Delivery">
+      <article class="beneficio">
+        <div aria-hidden="true">⚡</div>
+        <h3>Entrega rápida</h3>
+        <p>Escolha restaurantes próximos e acompanhe seu pedido.</p>
+      </article>
+      <article class="beneficio">
+        <div aria-hidden="true">⭐</div>
+        <h3>Bem avaliados</h3>
+        <p>Descubra os favoritos e encontre novos sabores.</p>
+      </article>
+      <article class="beneficio">
+        <div aria-hidden="true">🔒</div>
+        <h3>Pagamento na entrega</h3>
+        <p>Pague diretamente ao restaurante por PIX, cartão ou dinheiro.</p>
+      </article>
+    </section>
+
+    <section class="partner-cta" aria-labelledby="partnerTitle">
+      <div class="partner-content">
+        <div class="partner-copy">
+          <span class="eyebrow light">Cresça com a gente</span>
+          <h2 id="partnerTitle">Seu restaurante para milhares de clientes</h2>
+          <p>Cadastre seu negócio, gerencie produtos e pedidos em um painel simples e alcance novos clientes.</p>
+          <div class="partner-actions"><a class="button button-light" href="empresa-cadastro.html">Cadastrar restaurante →</a><a class="partner-link" href="empresa-login.html">Acessar painel</a></div>
+        </div>
+        <div class="partner-visual" aria-hidden="true"><span>🍕</span><span>📈</span><span>🛵</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+      <div>
+        <h2>🍔 Delivery</h2>
+        <p>Comida boa na sua porta.</p>
+      </div>
+      <div>
+        <h3>Cliente</h3>
+        <p><a href="perfil.html">Minha conta</a></p>
+        <p><a href="meus-pedidos.html">Meus pedidos</a></p>
+        <p>Ajuda</p>
+      </div>
+      <div>
+        <h3>Restaurante</h3>
+        <p><a href="empresa-cadastro.html">Cadastrar restaurante</a></p>
+        <p><a href="empresa-login.html">Área do parceiro</a></p>
+      </div>
+      <div>
+        <h3>Entregador</h3>
+        <p><a href="entregador.html">Quero fazer entregas</a></p>
+        <p><a href="entregador.html">Painel do entregador</a></p>
+      </div>
+    </div>
+    <div class="copyright">© 2026 Delivery</div>
+  </footer>
+
+  <!-- Modificado de DIV para BUTTON -->
+  <button class="floating-cart" id="floatingCart" type="button" aria-label="Abrir carrinho">
+    🛒
+    <span>0</span>
+  </button>
+
+  <!-- Atributo 'defer' adicionado para não travar a tela enquanto carrega -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="js/app-utils.js?v=2.6.1" defer></script>
+  <script src="js/supabase.js?v=2.6.1" defer></script>
+  <script src="js/config.js?v=3.1.0" defer></script>
+  <script src="js/monitoring.js?v=3.1.0" defer></script>
+  <script src="js/notifications.js?v=3.1.0" defer></script>
+  <script src="js/favorites-sync.js?v=3.4.0" defer></script>
+  <script src="js/home.js?v=3.4.0" defer></script>
+  
+  <!-- Um detalhe: idealmente, esse bloco inline pode ir para dentro de home.js, mas o encapsulamento que você usou já é ótimo. -->
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const busca = document.getElementById('campoBusca');
+    document.querySelectorAll('[data-search]').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        if (!busca) return;
+        busca.value = botao.dataset.search || '';
+        busca.dispatchEvent(new Event('input', { bubbles: true }));
+        document.getElementById('restaurantes')?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    
+    document.addEventListener('keydown', (evento) => {
+      if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'k') {
+        evento.preventDefault();
+        busca?.focus();
+      }
+    });
+  });
+  </script>
+  
+  <script src="js/site-enhancements.js?v=2.6.1" defer></script>
+</body>
+</html>

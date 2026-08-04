@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Entre na sua conta Delivery para acompanhar pedidos, endereços e restaurantes favoritos.">
+    <link href="assets/favicon.svg" rel="icon" type="image/svg+xml">
+    <title>Entrar | Delivery</title>
+    <link href="css/auth.css?v=3.4.0" rel="stylesheet">
+    <link href="css/accessibility.css?v=2.6.1" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#ea1d2c"><link rel="stylesheet" href="css/enhancements.css?v=3.4.0"></head>
+<body class="auth-page auth-customer auth-login-page">
+<noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
+
+<main class="auth-shell">
+    <section class="auth-showcase" aria-label="Vantagens do Delivery">
+        <a class="auth-brand" href="index.html" aria-label="Delivery - página inicial">
+            <span class="auth-brand-mark" aria-hidden="true">🍔</span>
+            <span>Delivery</span>
+        </a>
+
+        <div class="auth-showcase-content">
+            <p class="auth-kicker"><span class="auth-kicker-dot"></span> Peça, acompanhe, aproveite</p>
+            <h2>Seu pedido favorito começa aqui.</h2>
+            <p class="auth-showcase-copy">Entre para descobrir restaurantes perto de você, repetir seus pedidos preferidos e acompanhar cada etapa da entrega.</p>
+
+            <ul class="auth-benefits">
+                <li><span class="auth-benefit-icon" aria-hidden="true">✓</span> Ofertas e restaurantes selecionados para você</li>
+                <li><span class="auth-benefit-icon" aria-hidden="true">✓</span> Endereços e formas de pagamento em um só lugar</li>
+                <li><span class="auth-benefit-icon" aria-hidden="true">✓</span> Histórico e acompanhamento dos seus pedidos</li>
+            </ul>
+        </div>
+
+        <div>
+            <div class="auth-preview" aria-hidden="true">
+                <div class="auth-preview-main">
+                    <span class="auth-preview-icon">🛵</span>
+                    <span><strong>Seu pedido está a caminho</strong><small>Previsão de chegada: 24 minutos</small></span>
+                </div>
+                <span class="auth-preview-status">Em rota</span>
+            </div>
+            <div class="auth-showcase-foot">
+                <span>Pagamento protegido</span>
+                <span>Entrega simples e rápida</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-panel">
+        <div class="auth-panel-inner">
+            <a class="auth-mobile-brand" href="index.html">
+                <span class="auth-brand-mark" aria-hidden="true">🍔</span>
+                <span>Delivery</span>
+            </a>
+
+            <a class="auth-back" href="index.html">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+                Voltar para o início
+            </a>
+
+            <header class="auth-heading">
+                <p class="auth-eyebrow">Bem-vindo de volta</p>
+                <h1>Entre na sua conta</h1>
+                <p>Acesse seus pedidos, favoritos e endereços salvos.</p>
+            </header>
+
+            <nav class="auth-role-switch" aria-label="Escolher tipo de acesso">
+                <a class="active" href="login.html" aria-current="page">👤 Cliente</a>
+                <a href="empresa-login.html">🏪 Restaurante</a>
+            </nav>
+
+            <form class="auth-form" id="loginForm">
+                <div class="login-security-status" id="loginSecurityStatus" role="status" aria-live="polite" hidden></div>
+                <div class="auth-field">
+                    <label for="email">E-mail</label>
+                    <div class="auth-input-wrap">
+                        <span class="auth-input-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"></path><path d="m4 7 8 6 8-6"></path></svg>
+                        </span>
+                        <input autocomplete="email" id="email" maxlength="254" name="email" placeholder="voce@exemplo.com" required type="email">
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="senha">Senha</label>
+                    <div class="auth-input-wrap has-toggle">
+                        <span class="auth-input-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+                        </span>
+                        <input autocomplete="current-password" id="senha" maxlength="72" minlength="6" name="password" placeholder="Digite sua senha" required type="password">
+                        <button class="auth-password-toggle" data-toggle-password="senha" id="toggleSenha" type="button" aria-label="Mostrar senha" aria-pressed="false"></button>
+                    </div>
+                </div>
+
+                <div class="auth-form-options">
+                    <label class="auth-check" for="lembrar">
+                        <input id="lembrar" name="remember" type="checkbox">
+                        <span>Lembrar de mim</span>
+                    </label>
+                    <a class="auth-link" href="recuperar-senha.html">Esqueci minha senha</a>
+                </div>
+
+                <button class="auth-button" type="submit">
+                    <span>Entrar na minha conta</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
+                </button>
+            </form>
+
+            <div class="auth-divider">ou</div>
+            <p class="auth-switch-prompt">Ainda não possui uma conta? <a href="cadastro.html">Criar conta grátis</a></p>
+            <p class="auth-security-note">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                Seus dados são protegidos durante o acesso.
+            </p>
+        </div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app-utils.js?v=2.6.1"></script>
+<script src="js/supabase.js?v=2.6.1"></script>
+<script src="js/auth-ui.js?v=2.6.1"></script>
+<script src="js/login.js?v=3.4.0"></script>
+<script src="js/site-enhancements.js?v=2.6.1"></script></body>
+</html>

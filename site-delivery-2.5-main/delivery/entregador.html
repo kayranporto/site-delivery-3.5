@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#111827"/>
+  <meta name="description" content="Painel do entregador Multi Delivery para aceitar e acompanhar entregas em tempo real."/>
+  <title>Painel do entregador | Multi Delivery</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/entregador.css?v=3.1.0"/>
+  <link rel="stylesheet" href="css/accessibility.css?v=2.6.1"/>
+  <link rel="stylesheet" href="css/enhancements.css?v=3.1.0"/>
+</head>
+<body>
+  <noscript>Este painel precisa de JavaScript habilitado.</noscript>
+  <header class="driver-header">
+    <a class="driver-brand" href="index.html"><span>🛵</span><div><strong>Multi Delivery</strong><small>PAINEL DO ENTREGADOR</small></div></a>
+    <div class="driver-actions"><a href="perfil.html">Minha conta</a><button id="sairEntregador" type="button">Sair</button></div>
+  </header>
+
+  <main class="driver-main">
+    <div class="driver-loading" id="entregadorLoading"><span></span><strong>Carregando sua operação...</strong></div>
+
+    <section class="driver-card register-card" id="cadastroEntregador" hidden>
+      <span class="driver-kicker">QUERO ENTREGAR</span>
+      <h1>Cadastre-se como entregador</h1>
+      <p>Preencha seus dados. A conta ficará disponível após aprovação administrativa.</p>
+      <form id="entregadorForm">
+        <div class="driver-grid">
+          <label>Nome completo<input id="entregadorNome" maxlength="120" required autocomplete="name"/></label>
+          <label>Telefone<input id="entregadorTelefone" maxlength="30" required autocomplete="tel"/></label>
+          <label>Veículo<select id="entregadorVeiculo"><option>Moto</option><option>Bicicleta</option><option>Carro</option><option>A pé</option></select></label>
+          <label>Placa<input id="entregadorPlaca" maxlength="10" placeholder="Opcional"/></label>
+          <label class="wide">CPF ou documento<input id="entregadorDocumento" maxlength="40" placeholder="Usado somente na análise"/></label>
+        </div>
+        <button class="driver-primary" type="submit">Enviar cadastro</button>
+      </form>
+    </section>
+
+    <section class="pending-card" id="entregadorPendente" hidden>
+      <span>⏳</span><div><strong>Cadastro em análise</strong><p>Você poderá ficar online e aceitar entregas assim que a administração aprovar seus dados.</p></div>
+    </section>
+
+    <div id="entregadorApp" hidden>
+      <section class="driver-hero">
+        <div><span class="driver-kicker">OPERAÇÃO EM TEMPO REAL</span><h1>Olá, <span id="nomeEntregador">entregador</span>!</h1><p>Fique online, aceite uma rota e compartilhe sua localização durante a entrega.</p></div>
+        <label class="online-switch"><input id="entregadorOnline" type="checkbox"/><span></span><div><small>SEU STATUS</small><strong id="textoEntregadorOnline">Offline</strong></div></label>
+      </section>
+
+      <section class="driver-metrics" aria-label="Resumo das entregas">
+        <article><span>◎</span><div><small>Disponíveis</small><strong id="totalDisponiveis">0</strong></div></article>
+        <article><span>🛵</span><div><small>Em andamento</small><strong id="totalEmRota">0</strong></div></article>
+        <article><span>✓</span><div><small>Concluídas hoje</small><strong id="totalConcluidas">0</strong></div></article>
+        <article><span>⌖</span><div><small>Localização</small><strong id="statusLocalizacao">Desativada</strong></div></article>
+      </section>
+
+      <section class="driver-section">
+        <div class="driver-section-title"><div><span class="driver-kicker">MINHAS ROTAS</span><h2>Entregas em andamento</h2></div><button id="atualizarEntregas" type="button">↻ Atualizar</button></div>
+        <div class="driver-list" id="minhasEntregas"><p class="empty">Nenhuma entrega em andamento.</p></div>
+      </section>
+
+      <section class="driver-section">
+        <div class="driver-section-title"><div><span class="driver-kicker">NOVAS OPORTUNIDADES</span><h2>Entregas disponíveis</h2><p>O endereço completo aparece somente depois que você aceitar.</p></div></div>
+        <div class="driver-list available" id="entregasDisponiveis"><p class="empty">Fique online para consultar entregas.</p></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/config.js?v=3.1.0"></script>
+  <script src="js/monitoring.js?v=3.1.0"></script>
+  <script src="js/notifications.js?v=3.1.0"></script>
+  <script src="js/entregador.js?v=3.1.0"></script>
+</body>
+</html>

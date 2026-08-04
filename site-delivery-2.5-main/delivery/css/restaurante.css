@@ -1,0 +1,306 @@
+body > header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    min-height: 76px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px max(20px, calc((100vw - 1200px) / 2));
+    border-bottom: 1px solid #ececec;
+    background: rgba(255, 255, 255, .96);
+    backdrop-filter: blur(14px);
+}
+
+.avaliacoes-publicas{max-width:1200px;margin:20px auto 60px;padding:0 20px}.avaliacoes-titulo{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:17px}.avaliacoes-titulo small{color:#ea1d2c;font-size:9px;font-weight:800;letter-spacing:.13em}.avaliacoes-titulo h2{margin:4px 0 0;font-size:24px}.avaliacoes-titulo>span{color:#777;font-size:11px}.avaliacoes-lista{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.avaliacao-publica{padding:19px;border:1px solid #e7e9ee;border-radius:17px;background:#fff;box-shadow:0 10px 28px rgba(20,25,36,.05)}.avaliacao-publica .estrelas{color:#f2a800;letter-spacing:2px}.avaliacao-publica>p{min-height:45px;color:#535968;font-size:11px;line-height:1.6}.resposta-publica{margin-top:13px;padding:11px 13px;border-left:3px solid #168447;border-radius:9px;background:#f1faf5}.resposta-publica strong{display:block;color:#168447;font-size:8px}.resposta-publica p{margin:4px 0 0;font-size:9px;line-height:1.5}.avaliacao-publica time{color:#9297a3;font-size:8px}@media(max-width:850px){.avaliacoes-lista{grid-template-columns:1fr 1fr}}@media(max-width:560px){.avaliacoes-lista{grid-template-columns:1fr}}
+.avaliacao-autor{display:flex;align-items:center;gap:9px;margin-bottom:10px}.avaliacao-autor img,.avaliacao-autor>span{width:32px;height:32px;border-radius:50%;object-fit:cover}.avaliacao-autor>span{display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#ef2435,#bd1724);font-size:12px;font-weight:800}.avaliacao-autor strong{font-size:10px}
+
+body > header .voltar {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 13px;
+    background: #f3f3f4;
+    font-size: 22px;
+}
+
+body > header .logo {
+    margin-right: auto;
+}
+
+/* ===========================
+   Banner
+=========================== */
+
+.banner-restaurante {
+    width: 100%;
+    height: 320px;
+    overflow: hidden;
+}
+
+.banner-restaurante img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===========================
+   Informações
+=========================== */
+
+.info-restaurante {
+    max-width: 1200px;
+    margin: -70px auto 30px;
+    padding: 0 20px;
+    display: flex;
+    align-items: flex-end;
+    gap: 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.logo-restaurante {
+    width: 140px;
+    height: 140px;
+    border-radius: 24px;
+    border: 6px solid #fff;
+    object-fit: cover;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+}
+
+.info-restaurante h1 {
+    font-size: 34px;
+    margin-bottom: 8px;
+}
+
+.info-restaurante p {
+    margin: 6px 0;
+    color: #666;
+    font-size: 15px;
+}
+
+.restaurante-meta {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.restaurante-meta .metas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-weight: 700;
+    color: #fff;
+    background: #16A34A;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, .12);
+}
+
+.status-badge.fechado {
+    background: #6B7280;
+}
+
+.meta-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: #fff;
+    color: #333;
+    font-weight: 700;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .08);
+}
+
+.restaurant-actions button {
+    min-width: 180px;
+}
+
+@media(max-width:768px) {
+    .restaurante-meta {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .restaurant-actions {
+        width: 100%;
+    }
+}
+
+/* ===========================
+   Pesquisa
+=========================== */
+
+.pesquisa-produtos {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.pesquisa-produtos input {
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    outline: none;
+    font-size: 16px;
+}
+
+/* ===========================
+   Categorias
+=========================== */
+
+.categorias {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+}
+
+.categorias button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 25px;
+    background: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .3s;
+    white-space: nowrap;
+    box-shadow: 0 5px 15px rgba(0,0,0,.06);
+}
+
+.categorias button:hover {
+    transform: translateY(-2px);
+}
+
+.categorias .ativo {
+    background: #EA1D2C;
+    color: white;
+}
+
+/* ===========================
+   Produtos
+=========================== */
+
+.produtos {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.lista-produtos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px,1fr));
+    gap: 25px;
+}
+
+/* Card */
+
+.produto {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    transition: .3s;
+}
+
+.produto:hover {
+    transform: translateY(-6px);
+}
+
+.produto img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.produto-info {
+    padding: 20px;
+}
+
+.produto-info h3 {
+    margin-bottom: 10px;
+}
+
+.produto-info p {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.rodape-produto {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.preco {
+    color: #EA1D2C;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.btn-add {
+    border: none;
+    background: #EA1D2C;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.btn-add:hover {
+    background: #c51624;
+}
+
+/* ===========================
+   Responsivo
+=========================== */
+
+@media(max-width:768px){
+
+    .banner-restaurante{
+        height:220px;
+    }
+
+    .info-restaurante{
+        flex-direction:column;
+        align-items:center;
+        text-align:center;
+        margin-top:-50px;
+    }
+
+    .logo-restaurante{
+        width:110px;
+        height:110px;
+    }
+
+    .info-restaurante h1{
+        font-size:28px;
+    }
+
+    .lista-produtos{
+        grid-template-columns:1fr;
+    }
+
+}
