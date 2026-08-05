@@ -21,11 +21,11 @@ const campoCupom = document.getElementById("cupom");
 const btnFinalizar = document.getElementById("finalizarPedido");
 const btnVoltar = document.querySelector(".checkout-header .voltar");
 const observacoes = document.getElementById("observacoesPedido");
+const observacoesContador = document.getElementById("observacoesContador");
 const trocoField = document.getElementById("trocoField");
 const trocoPara = document.getElementById("trocoPara");
-const agendamentoField = document.getElementById("agendamentoField");
-const agendadoPara = document.getElementById("agendadoPara");
 const pagamentoNota = document.getElementById("pagamentoNota");
+const footerTotalElemento = document.getElementById("footerTotal");
 
 function avisarCheckout(mensagem, tipo = "error", titulo = "Finalizar pedido") {
     if (window.AppToast) window.AppToast(titulo, mensagem, tipo);
@@ -201,6 +201,7 @@ function atualizarTotais() {
     taxaElemento.textContent = App.dinheiro(taxaEntrega());
     descontoElemento.textContent = `− ${App.dinheiro(desconto)}`;
     totalElemento.textContent = App.dinheiro(calcularTotal());
+    if (footerTotalElemento) footerTotalElemento.textContent = App.dinheiro(calcularTotal());
     atualizarMensagemPedidoMinimo();
 }
 
@@ -361,13 +362,6 @@ function valorTroco() {
     return Number.isFinite(numero) ? numero : null;
 }
 
-function valorAgendamento() {
-    if (document.querySelector("input[name='tipoEntrega']:checked")?.value !== "agendado") return null;
-    const data = new Date(agendadoPara.value);
-    if (!OrderUtils.validarAgendamento(data)) return false;
-    return data.toISOString();
-}
-
 async function finalizarPedido() {
     if (!carrinho.length || !itensValidos() || !carrinhoMeta?.empresa_id) return avisarCheckout("Seu carrinho está vazio ou possui dados inválidos.");
 
@@ -401,9 +395,6 @@ async function finalizarPedido() {
     const pagamento = document.querySelector("input[name='pagamento']:checked")?.value;
     if (!pagamento) return avisarCheckout("Selecione uma forma de pagamento.", "info");
 
-    const horarioAgendado = valorAgendamento();
-    if (horarioAgendado === false) return avisarCheckout("Escolha um agendamento entre 30 minutos e 7 dias.", "info");
-
     const troco = pagamento === "Dinheiro" ? valorTroco() : null;
     if (pagamento === "Dinheiro" && trocoPara.value.trim() && (troco === null || troco < calcularTotal())) {
         return avisarCheckout("Informe um valor de troco maior ou igual ao total do pedido.", "info");
@@ -430,7 +421,7 @@ async function finalizarPedido() {
             p_observacoes: observacoesFinais,
             p_cupom: cupomAplicado || null,
             p_itens: itens,
-            p_agendado_para: horarioAgendado
+            p_agendado_para: null
         });
         if (erroPedido) throw erroPedido;
         if (!pedidoCriado?.id) throw new Error("O banco não retornou o pedido criado.");
@@ -487,14 +478,9 @@ document.querySelectorAll("input[name='pagamento']").forEach((input) => {
             : "O pagamento será realizado diretamente ao restaurante na entrega. Nenhum dado de cartão é solicitado neste site.";
     });
 });
-document.querySelectorAll("input[name='tipoEntrega']").forEach((input) => input.addEventListener("change", () => {
-    agendamentoField.hidden = input.value !== "agendado" || !input.checked;
-    if (!agendamentoField.hidden && !agendadoPara.value) {
-        const minimo = new Date(Date.now() + 35 * 60 * 1000);
-        minimo.setMinutes(minimo.getMinutes() - minimo.getTimezoneOffset());
-        agendadoPara.value = minimo.toISOString().slice(0, 16);
-    }
-}));
+observacoes.addEventListener("input", () => {
+    if (observacoesContador) observacoesContador.textContent = `${observacoes.value.length}/500`;
+});
 btnFinalizar.addEventListener("click", async () => {
     const confirmado = window.AppConfirm
         ? await window.AppConfirm({ titulo: "Confirmar pedido", mensagem: `Enviar o pedido no valor de ${App.dinheiro(calcularTotal())} para ${carrinhoMeta?.empresa_nome || "o restaurante"}?`, confirmar: "Confirmar e enviar" })
