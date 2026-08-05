@@ -1,150 +1,153 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Finalizar Pedido | Delivery</title>
-<link href="assets/favicon.svg" rel="icon" type="image/svg+xml"/>
-<link href="css/style.css?v=2.6.1" rel="stylesheet"/>
-<link href="css/checkout.css?v=3.4.0" rel="stylesheet"/>
-<link href="css/accessibility.css?v=2.6.1" rel="stylesheet"/><meta content="Finalizar Pedido | Delivery — plataforma de pedidos e restaurantes." name="description"/><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#ea1d2c"><link rel="stylesheet" href="css/enhancements.css?v=3.4.0"></head>
-<body><noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
-<header class="checkout-header">
-<a class="voltar" href="restaurante.html">←</a>
-<h1>Finalizar Pedido</h1>
-</header>
-<main class="checkout-container">
-<!-- Endereço -->
-<section class="checkout-card">
-<h2>📍 Endereço de Entrega</h2>
-<div class="endereco">
-<p id="enderecoEntrega">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Finalizar pedido | Delivery</title>
+  <meta name="description" content="Revise o endereço, o pagamento e os itens antes de finalizar seu pedido."/>
+  <meta name="theme-color" content="#ea1d2c"/>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css?v=2.6.1"/>
+  <link rel="stylesheet" href="css/checkout.css?v=3.6.0"/>
+  <link rel="stylesheet" href="css/accessibility.css?v=2.6.1"/>
+  <link rel="stylesheet" href="css/enhancements.css?v=3.4.0"/>
+</head>
+<body>
+  <noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
 
-                Nenhum endereço informado.
+  <header class="checkout-header">
+    <div class="checkout-header-inner">
+      <a class="voltar" href="restaurante.html" aria-label="Voltar ao restaurante">←</a>
+      <div class="checkout-heading">
+        <span>CHECKOUT SEGURO</span>
+        <h1>Finalizar pedido</h1>
+      </div>
+      <div class="checkout-security" aria-label="Ambiente protegido">
+        <span aria-hidden="true">🔒</span>
+        <div><strong>Ambiente protegido</strong><small>Seus dados estão seguros</small></div>
+      </div>
+    </div>
+  </header>
 
-            </p>
-<button id="alterarEndereco" type="button">
+  <main class="checkout-container">
+    <div class="checkout-flow">
+      <section class="checkout-card checkout-card--address" aria-labelledby="tituloEndereco">
+        <div class="card-heading">
+          <span class="card-icon" aria-hidden="true">📍</span>
+          <div><small>ETAPA 1</small><h2 id="tituloEndereco">Endereço de entrega</h2></div>
+        </div>
+        <div class="endereco">
+          <div class="endereco-copy">
+            <span class="endereco-label">ENTREGAR EM</span>
+            <p id="enderecoEntrega">Nenhum endereço informado.</p>
+          </div>
+          <button id="alterarEndereco" type="button">Alterar endereço</button>
+        </div>
+        <div class="delivery-preview">
+          <span aria-hidden="true">🗺️</span>
+          <div>
+            <strong id="previsaoCheckout">Calculando previsão...</strong>
+            <small id="areaCheckout">Confira o endereço e a região atendida.</small>
+          </div>
+          <a id="abrirMapaEndereco" href="https://www.openstreetmap.org" target="_blank" rel="noopener">Ver mapa <span aria-hidden="true">↗</span></a>
+        </div>
+        <p class="pedido-minimo" id="pedidoMinimoMensagem"></p>
+      </section>
 
-                Alterar Endereço
+      <section class="checkout-card" aria-labelledby="tituloPagamento">
+        <div class="card-heading">
+          <span class="card-icon" aria-hidden="true">💳</span>
+          <div><small>ETAPA 2</small><h2 id="tituloPagamento">Forma de pagamento</h2></div>
+        </div>
+        <div class="payment-options">
+          <label class="payment-option">
+            <input checked name="pagamento" type="radio" value="PIX"/>
+            <span class="payment-icon" aria-hidden="true">⚡</span>
+            <span class="payment-copy"><strong>PIX na entrega</strong><small>Rápido e sem contato</small></span>
+            <span class="payment-check" aria-hidden="true"></span>
+          </label>
+          <label class="payment-option">
+            <input name="pagamento" type="radio" value="Cartão"/>
+            <span class="payment-icon" aria-hidden="true">💳</span>
+            <span class="payment-copy"><strong>Cartão na entrega</strong><small>Débito ou crédito na maquininha</small></span>
+            <span class="payment-check" aria-hidden="true"></span>
+          </label>
+          <label class="payment-option">
+            <input name="pagamento" type="radio" value="Dinheiro"/>
+            <span class="payment-icon" aria-hidden="true">💵</span>
+            <span class="payment-copy"><strong>Dinheiro</strong><small>Informe o troco se necessário</small></span>
+            <span class="payment-check" aria-hidden="true"></span>
+          </label>
+          <label class="payment-option online-payment-option">
+            <input name="pagamento" type="radio" value="Online"/>
+            <span class="payment-icon" aria-hidden="true">🛡️</span>
+            <span class="payment-copy"><strong>Pagar online</strong><small>PIX ou cartão pelo Mercado Pago</small></span>
+            <span class="payment-badge">ONLINE</span>
+            <span class="payment-check" aria-hidden="true"></span>
+          </label>
+        </div>
+        <p class="pagamento-note" id="pagamentoNota">O pagamento será realizado diretamente ao restaurante na entrega. Nenhum dado de cartão é solicitado neste site.</p>
+        <div class="troco-field" id="trocoField" hidden>
+          <label for="trocoPara">Precisa de troco para quanto?</label>
+          <input id="trocoPara" inputmode="decimal" maxlength="20" placeholder="Ex.: 100,00"/>
+        </div>
+      </section>
 
-            </button>
-</div>
-<div class="delivery-preview"><span aria-hidden="true">🗺️</span><div><strong id="previsaoCheckout">Calculando previsão...</strong><small id="areaCheckout">Confira o endereço e a região atendida.</small></div><a id="abrirMapaEndereco" href="https://www.openstreetmap.org" target="_blank" rel="noopener">Ver no mapa ↗</a></div>
-<p class="pedido-minimo" id="pedidoMinimoMensagem"></p>
-</section>
-<!-- Agendamento -->
-<section class="checkout-card">
-<h2>🕐 Quando entregar?</h2>
-<div class="schedule-options">
-<label><input checked name="tipoEntrega" type="radio" value="agora"/> Entregar assim que possível</label>
-<label><input name="tipoEntrega" type="radio" value="agendado"/> Agendar data e horário</label>
-</div>
-<div class="schedule-field" id="agendamentoField" hidden>
-<label for="agendadoPara">Data e horário da entrega</label>
-<input id="agendadoPara" type="datetime-local"/>
-<small>Escolha um horário entre 30 minutos e 7 dias.</small>
-</div>
-</section>
-<!-- Observações -->
-<section class="checkout-card">
-<h2>📝 Observações</h2>
-<textarea aria-label="Observações do pedido" id="observacoesPedido" maxlength="500" placeholder="Alguma observação para o pedido?"></textarea>
-</section>
-<!-- Pagamento -->
-<section class="checkout-card">
-<h2>💳 Forma de Pagamento</h2>
-<label>
-<input checked="" name="pagamento" type="radio" value="PIX"/>
+      <section class="checkout-card" aria-labelledby="tituloObservacoes">
+        <div class="card-heading">
+          <span class="card-icon" aria-hidden="true">📝</span>
+          <div><small>OPCIONAL</small><h2 id="tituloObservacoes">Observações</h2></div>
+        </div>
+        <textarea aria-label="Observações do pedido" id="observacoesPedido" maxlength="500" placeholder="Ex.: sem cebola, molho à parte ou outra preferência..."></textarea>
+        <div class="field-helper"><span>O restaurante receberá esta mensagem com o pedido.</span><span id="observacoesContador">0/500</span></div>
+      </section>
 
-            PIX na entrega
+      <section class="checkout-card" aria-labelledby="tituloCupom">
+        <div class="card-heading">
+          <span class="card-icon" aria-hidden="true">🎟️</span>
+          <div><small>ECONOMIZE</small><h2 id="tituloCupom">Cupom de desconto</h2></div>
+        </div>
+        <div class="cupom-box">
+          <input aria-label="Cupom de desconto" autocomplete="off" id="cupom" maxlength="40" placeholder="Digite seu cupom" type="text"/>
+          <button id="btnCupom" type="button">Aplicar cupom</button>
+        </div>
+      </section>
+    </div>
 
-        </label>
-<label>
-<input name="pagamento" type="radio" value="Cartão"/>
+    <aside class="checkout-card checkout-summary" id="checkoutResumo" aria-labelledby="tituloResumo">
+      <div class="summary-heading">
+        <div><small>SEU PEDIDO</small><h2 id="tituloResumo">Resumo</h2></div>
+        <span class="summary-badge">Revise antes de enviar</span>
+      </div>
+      <div id="listaResumo"></div>
+      <div class="summary-totals">
+        <div class="linha"><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div>
+        <div class="linha"><span>Taxa de entrega</span><strong id="taxa">R$ 0,00</strong></div>
+        <div class="linha discount"><span>Desconto</span><strong id="desconto">− R$ 0,00</strong></div>
+        <div class="linha total"><span>Total</span><strong id="total">R$ 0,00</strong></div>
+      </div>
+      <div class="summary-trust"><span aria-hidden="true">✓</span><p><strong>Compra protegida</strong><small>Confira os dados antes de confirmar.</small></p></div>
+    </aside>
+  </main>
 
-            Cartão na entrega
+  <footer class="checkout-footer">
+    <div class="checkout-footer-inner">
+      <div class="footer-total"><span>Total do pedido</span><strong id="footerTotal">R$ 0,00</strong></div>
+      <button id="finalizarPedido" type="button"><span>Confirmar e finalizar</span><span aria-hidden="true">→</span></button>
+    </div>
+  </footer>
 
-        </label>
-<label>
-<input name="pagamento" type="radio" value="Dinheiro"/>
-
-            Dinheiro na entrega
-
-</label>
-<label class="online-payment-option">
-<input name="pagamento" type="radio" value="Online"/>
-<span><strong>Pagar online</strong><small>PIX ou cartão no ambiente seguro do Mercado Pago</small></span>
-</label>
-<p class="pagamento-note" id="pagamentoNota">O pagamento será realizado diretamente ao restaurante na entrega. Nenhum dado de cartão é solicitado neste site.</p>
-<div class="troco-field" id="trocoField" hidden>
-<label for="trocoPara">Precisa de troco para quanto?</label>
-<input id="trocoPara" inputmode="decimal" maxlength="20" placeholder="Ex.: 100,00"/>
-</div>
-</section>
-<!-- Cupom -->
-<section class="checkout-card">
-<h2>🎟 Cupom de Desconto</h2>
-<div class="cupom-box">
-<input aria-label="Cupom de desconto" autocomplete="off" id="cupom" maxlength="40" placeholder="Digite o cupom" type="text"/>
-<button id="btnCupom" type="button">
-
-                Aplicar
-
-            </button>
-</div>
-</section>
-<!-- Resumo -->
-<section class="checkout-card" id="checkoutResumo">
-<h2>📦 Resumo do Pedido</h2>
-<div id="listaResumo"></div>
-<hr/>
-<div class="linha">
-<span>Subtotal</span>
-<strong id="subtotal">
-
-                R$ 0,00
-
-            </strong>
-</div>
-<div class="linha">
-<span>Entrega</span>
-<strong id="taxa">
-
-                R$ 5,99
-
-            </strong>
-</div>
-<div class="linha">
-<span>Desconto</span>
-<strong id="desconto">
-
-                R$ 0,00
-
-            </strong>
-</div>
-<div class="linha total">
-<span>Total</span>
-<strong id="total">
-
-                R$ 0,00
-
-            </strong>
-</div>
-</section>
-</main>
-<footer class="checkout-footer">
-<button id="finalizarPedido" type="button">
-
-        Finalizar Pedido
-
-    </button>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/app-utils.js?v=2.6.1"></script><script src="js/supabase.js?v=2.6.1"></script>
-<script src="js/dialogs.js?v=3.4.0"></script><script src="js/cart-store.js?v=3.4.0"></script>
-<script src="js/monitoring.js?v=3.1.0"></script>
-<script src="js/order-utils.js?v=3.1.0"></script>
-<script src="js/checkout.js?v=3.5.0"></script>
-<script src="js/site-enhancements.js?v=2.6.1"></script></body>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app-utils.js?v=2.6.1"></script>
+  <script src="js/supabase.js?v=2.6.1"></script>
+  <script src="js/dialogs.js?v=3.4.0"></script>
+  <script src="js/cart-store.js?v=3.4.0"></script>
+  <script src="js/monitoring.js?v=3.1.0"></script>
+  <script src="js/checkout.js?v=3.6.0"></script>
+  <script src="js/site-enhancements.js?v=2.6.1"></script>
+</body>
 </html>
