@@ -552,3 +552,23 @@ carts.forEach((cart) => {
     carregarEmpresas();
     carregarDestaques();
 })();
+
+// Atalhos de busca e teclado da página inicial.
+document.addEventListener('DOMContentLoaded', () => {
+    const busca = document.getElementById('campoBusca');
+    document.querySelectorAll('[data-search]').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        if (!busca) return;
+        busca.value = botao.dataset.search || '';
+        busca.dispatchEvent(new Event('input', { bubbles: true }));
+        document.getElementById('restaurantes')?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    
+    document.addEventListener('keydown', (evento) => {
+      if ((evento.ctrlKey || evento.metaKey) && evento.key.toLowerCase() === 'k') {
+        evento.preventDefault();
+        busca?.focus();
+      }
+    });
+  });

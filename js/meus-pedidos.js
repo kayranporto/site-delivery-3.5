@@ -107,14 +107,14 @@ function criarCard(pedido, indice) {
     topo.append(titulo, data);
     const restaurante = criar("p", "order-store", pedido.empresa_nome || "Restaurante");
     const itens = criar("p", "order-items", (pedido.pedido_itens || [])
-        .map((item) => `${Number(item?.quantidade) || 1}x ${item?.nome_produto || "Produto"}`)
+        .map((item) => `${Number(item?.quantidade) || 1}x ${item?.nome_produto || "Produto"}${item?.variante_nome ? ` • ${item.variante_nome}` : ""}`)
         .join(" • ") || "Itens do pedido");
     info.append(topo, restaurante, itens);
     const avaliacao = criarAvaliacao(pedido);
     if (avaliacao) info.append(avaliacao);
 
     const lado = criar("div", "order-side");
-    const badge = criar("span", "status-badge", nomeStatus(status));
+    const badge = criar("span", "status-badge", status === "preparando" && pedido.pronto_em ? "Pronto para retirada" : nomeStatus(status));
     const pagamento = criar("span", "payment-label", pedido.pagamento_status === "pago"
         ? "Pagamento confirmado"
         : "Pagamento na entrega");

@@ -3,12 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com 'sha256-u0u1ecLVPYNekrgEx+XAUkD4bQUKUR6DUioTn79RARQ='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; worker-src 'self' blob:; manifest-src 'self'; form-action 'self'; upgrade-insecure-requests"/>
+  <meta name="referrer" content="strict-origin-when-cross-origin"/>
     <meta name="description" content="Crie sua conta de cliente no Delivery e faça pedidos em restaurantes da sua região.">
     <link href="assets/favicon.svg" rel="icon" type="image/svg+xml">
     <title>Criar conta | Delivery</title>
-    <link href="css/auth.css?v=2.6.1" rel="stylesheet">
-    <link href="css/accessibility.css?v=2.6.1" rel="stylesheet">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#ea1d2c"><link rel="stylesheet" href="css/enhancements.css?v=2.6.1"></head>
+    <link href="css/auth.css?v=4.2.0" rel="stylesheet">
+    <link href="css/accessibility.css?v=4.2.0" rel="stylesheet">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#ea1d2c"><link rel="stylesheet" href="css/enhancements.css?v=4.2.0"></head>
 <body class="auth-page auth-customer auth-register-page">
 <noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
 
@@ -115,19 +117,19 @@
                         <label for="senha">Senha</label>
                         <div class="auth-input-wrap has-toggle">
                             <span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span>
-                            <input aria-describedby="senhaForca" autocomplete="new-password" data-password-strength="senhaForca" id="senha" maxlength="72" minlength="6" name="new-password" placeholder="Mínimo de 6 caracteres" required type="password">
+                            <input aria-describedby="senhaForca" autocomplete="new-password" data-password-strength="senhaForca" id="senha" maxlength="72" minlength="8" name="new-password" placeholder="8 caracteres, letra e número" required type="password">
                             <button class="auth-password-toggle" data-toggle-password="senha" type="button" aria-label="Mostrar senha" aria-pressed="false"></button>
                         </div>
                         <div class="auth-strength" data-level="0" id="senhaForca">
                             <div class="auth-strength-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-                            <span class="auth-strength-text">Use ao menos 6 caracteres.</span>
+                            <span class="auth-strength-text">Use 8 caracteres, incluindo letra e número.</span>
                         </div>
                     </div>
                     <div class="auth-field">
                         <label for="confirmarSenha">Confirmar senha</label>
                         <div class="auth-input-wrap has-toggle">
                             <span class="auth-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span>
-                            <input aria-describedby="senhaMatch" autocomplete="new-password" data-match-password="senha" id="confirmarSenha" maxlength="72" minlength="6" name="confirm-password" placeholder="Repita sua senha" required type="password">
+                            <input aria-describedby="senhaMatch" autocomplete="new-password" data-match-password="senha" id="confirmarSenha" maxlength="72" minlength="8" name="confirm-password" placeholder="Repita sua senha" required type="password">
                             <button class="auth-password-toggle" data-toggle-password="confirmarSenha" type="button" aria-label="Mostrar senha" aria-pressed="false"></button>
                         </div>
                         <span class="auth-match-hint" id="senhaMatch">Repita a mesma senha.</span>
@@ -136,8 +138,13 @@
 
                 <label class="auth-check" for="termos">
                     <input id="termos" required type="checkbox">
-                    <span>Li e aceito os Termos de Uso e a Política de Privacidade do Delivery.</span>
+                    <span>Li e aceito os <a href="privacidade.html" target="_blank" rel="noopener">Termos e a Política de Privacidade</a> do Multi Delivery.</span>
                 </label>
+
+                <p class="auth-instant-note" role="note">A conta é liberada imediatamente, sem etapa de confirmação por e-mail.</p>
+
+                <div class="auth-captcha" data-turnstile tabindex="-1" aria-label="Verificação contra robôs" hidden></div>
+                <p class="auth-captcha-note" data-captcha-note hidden>Verificação de segurança para impedir cadastros automatizados.</p>
 
                 <button class="auth-button" type="submit">
                     <span>Criar minha conta</span>
@@ -155,10 +162,12 @@
     </section>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/app-utils.js?v=2.6.1"></script>
-<script src="js/supabase.js?v=2.6.1"></script>
-<script src="js/auth-ui.js?v=2.6.1"></script>
-<script src="js/cadastro.js?v=2.6.1"></script>
-<script src="js/site-enhancements.js?v=2.6.1"></script></body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
+<script src="js/app-utils.js?v=4.2.0"></script>
+<script src="js/config.js?v=4.2.0"></script>
+<script src="js/supabase.js?v=4.2.0"></script>
+<script src="js/auth-ui.js?v=4.2.0"></script>
+<script src="js/captcha.js?v=4.2.0"></script>
+<script src="js/cadastro.js?v=4.2.0"></script>
+<script src="js/site-enhancements.js?v=4.2.0"></script></body>
 </html>

@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com 'sha256-u0u1ecLVPYNekrgEx+XAUkD4bQUKUR6DUioTn79RARQ='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; worker-src 'self' blob:; manifest-src 'self'; form-action 'self'; upgrade-insecure-requests"/>
+  <meta name="referrer" content="strict-origin-when-cross-origin"/>
   <meta name="theme-color" content="#171a24"/>
   <meta name="description" content="Gerencie pedidos, vendas e cardápio do restaurante."/>
   <title>Painel do restaurante | Multi Delivery</title>
@@ -11,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/empresa-dashboard.css?v=3.5.0"/>
-  <link rel="stylesheet" href="css/accessibility.css?v=2.6.1"/>
-  <link rel="stylesheet" href="css/enhancements.css?v=3.1.0"/>
+  <link rel="stylesheet" href="css/empresa-dashboard.css?v=4.2.0"/>
+  <link rel="stylesheet" href="css/accessibility.css?v=4.2.0"/>
+  <link rel="stylesheet" href="css/enhancements.css?v=4.2.0"/>
 </head>
 <body>
   <noscript>Este site precisa de JavaScript habilitado para funcionar.</noscript>
@@ -24,8 +26,9 @@
       <div><strong>Multi</strong><small>RESTAURANTE</small></div>
     </a>
     <nav aria-label="Seções do painel">
-      <a class="active" href="#visaoGeral"><span>⌂</span> Visão geral</a>
+      <a class="active" href="#visaoGeral" aria-current="page"><span>⌂</span> Visão geral</a>
       <a href="#pedidos"><span>▣</span> Pedidos <b id="pedidosAtivosMenu">0</b></a>
+      <a href="#cozinha"><span>♨</span> Cozinha <b id="pedidosCozinhaMenu">0</b></a>
       <a href="#cardapio"><span>☷</span> Cardápio</a>
       <a href="#personalizacoes"><span>✦</span> Personalizações</a>
       <a href="#promocoes"><span>%</span> Promoções</a>
@@ -56,12 +59,13 @@
     </header>
 
     <main class="dashboard-main">
+      <section class="dashboard-view dashboard-overview is-active" id="visaoGeral" data-dashboard-view tabindex="-1" aria-label="Visão geral">
       <section class="approval-alert" id="publicacaoAviso" hidden role="status">
         <span aria-hidden="true">⏳</span>
         <div><strong>Loja aguardando aprovação</strong><p>Complete o cardápio e as configurações enquanto a análise administrativa é concluída.</p></div>
       </section>
 
-      <section class="overview-hero" id="visaoGeral">
+      <section class="overview-hero">
         <div class="overview-copy">
           <span class="eyebrow">OPERAÇÃO EM TEMPO REAL</span>
           <h2>Olá! Vamos acompanhar as vendas de hoje?</h2>
@@ -103,8 +107,9 @@
           <div class="top-products" id="produtosMaisVendidos"><div class="chart-loading">Calculando produtos...</div></div>
         </article>
       </section>
+      </section>
 
-      <section class="orders-section" id="pedidos">
+      <section class="orders-section dashboard-view" id="pedidos" data-dashboard-view tabindex="-1" aria-label="Pedidos" hidden>
         <div class="section-heading orders-title">
           <div><span class="section-kicker">OPERAÇÃO</span><h2>Pedidos em tempo real</h2><p>Avance os cartões conforme o preparo e a entrega.</p></div>
           <button class="refresh-button" id="atualizarPedidos" type="button">↻ Atualizar</button>
@@ -116,6 +121,7 @@
               <option value="todos">Todos</option>
               <option value="recebido">Recebidos</option>
               <option value="preparando">Preparando</option>
+              <option value="pronto">Prontos</option>
               <option value="saiu_para_entrega">Em entrega</option>
               <option value="entregue">Entregues</option>
               <option value="cancelado">Cancelados</option>
@@ -125,7 +131,22 @@
         <div class="kanban" id="pedidosEmpresa" aria-live="polite"><div class="panel-loading">Carregando pedidos...</div></div>
       </section>
 
-      <section class="management-section" id="cardapio">
+      <section class="management-section kitchen-section dashboard-view" id="cozinha" data-dashboard-view tabindex="-1" aria-label="Cozinha" hidden>
+        <div class="section-heading kitchen-heading">
+          <div><span class="section-kicker">PRODUÇÃO</span><h2>Fila da cozinha</h2><p>Controle o início do preparo, o prazo prometido e os pedidos prontos para retirada.</p></div>
+          <button class="refresh-button" id="atualizarCozinha" type="button">↻ Atualizar</button>
+        </div>
+        <div class="kitchen-metrics" aria-label="Indicadores da cozinha">
+          <article><small>Aguardando início</small><strong id="cozinhaRecebidos">0</strong></article>
+          <article><small>Em preparo</small><strong id="cozinhaPreparando">0</strong></article>
+          <article><small>Prontos</small><strong id="cozinhaProntos">0</strong></article>
+          <article class="danger"><small>Atrasados</small><strong id="cozinhaAtrasados">0</strong></article>
+          <article><small>Tempo médio</small><strong id="cozinhaTempoMedio">0 min</strong></article>
+        </div>
+        <div class="kitchen-board" id="filaCozinha" aria-live="polite"><div class="panel-loading">Carregando fila...</div></div>
+      </section>
+
+      <section class="management-section dashboard-view" id="cardapio" data-dashboard-view tabindex="-1" aria-label="Cardápio" hidden>
         <div class="section-heading"><div><span class="section-kicker">GESTÃO</span><h2>Cardápio</h2><p>Organize categorias e mantenha seus produtos atualizados.</p></div></div>
         <div class="management-grid">
           <article class="dashboard-card">
@@ -160,11 +181,23 @@
         </div>
         <article class="dashboard-card products-table-card">
           <div class="section-heading"><h3>Produtos cadastrados</h3><span id="resumoProdutos">0 produtos</span></div>
-          <div class="table-wrap"><table><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Disponível</th><th>Ações</th></tr></thead><tbody id="produtosEmpresa"><tr><td colspan="5">Carregando...</td></tr></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Variações</th><th>Disponível</th><th>Ações</th></tr></thead><tbody id="produtosEmpresa"><tr><td colspan="6">Carregando...</td></tr></tbody></table></div>
+        </article>
+        <article class="dashboard-card variants-card">
+          <div class="section-heading"><div><h3>Tamanhos e variações</h3><p>Use para tamanhos, volumes, sabores-base ou versões com preços diferentes.</p></div><span id="resumoVariantes">0 variações</span></div>
+          <form id="varianteForm" class="variant-form">
+            <div class="field"><label for="varianteProduto">Produto</label><select id="varianteProduto" required><option value="">Selecione um produto</option></select></div>
+            <div class="field"><label for="varianteNome">Nome da variação</label><input id="varianteNome" maxlength="80" placeholder="Ex.: Grande" required/></div>
+            <div class="field"><label for="variantePreco">Preço</label><input id="variantePreco" type="number" min="0" step="0.01" required/></div>
+            <div class="field"><label for="variantePromocao">Preço promocional</label><input id="variantePromocao" type="number" min="0" step="0.01" placeholder="Opcional"/></div>
+            <label class="checkbox-admin"><input id="varianteAtiva" type="checkbox" checked/> Variação disponível</label>
+            <button class="btn" id="varianteSalvar" type="submit">Adicionar variação</button>
+          </form>
+          <div class="variants-list" id="variantesEmpresa"><p class="empty">Cadastre um produto para adicionar variações.</p></div>
         </article>
       </section>
 
-      <section class="management-section" id="personalizacoes">
+      <section class="management-section dashboard-view" id="personalizacoes" data-dashboard-view tabindex="-1" aria-label="Personalizações" hidden>
         <div class="section-heading"><div><span class="section-kicker">EXTRAS</span><h2>Adicionais e personalizações</h2><p>Crie escolhas e vincule-as aos produtos.</p></div></div>
         <article class="dashboard-card">
           <div class="personalization-grid">
@@ -184,7 +217,7 @@
         </article>
       </section>
 
-      <section class="management-section" id="promocoes">
+      <section class="management-section dashboard-view" id="promocoes" data-dashboard-view tabindex="-1" aria-label="Promoções" hidden>
         <div class="section-heading"><div><span class="section-kicker">CAMPANHAS</span><h2>Promoções e cupons</h2><p>Crie benefícios com validade, limite por cliente e teto de desconto.</p></div></div>
         <div class="management-grid">
           <article class="dashboard-card">
@@ -208,12 +241,12 @@
         </div>
       </section>
 
-      <section class="management-section" id="avaliacoes">
+      <section class="management-section dashboard-view" id="avaliacoes" data-dashboard-view tabindex="-1" aria-label="Avaliações" hidden>
         <div class="section-heading"><div><span class="section-kicker">REPUTAÇÃO</span><h2>Avaliações dos clientes</h2><p>Leia os comentários e responda publicamente com atenção.</p></div><strong id="mediaAvaliacoes">—</strong></div>
         <div class="reviews-admin" id="avaliacoesEmpresa"><p class="empty">Carregando avaliações...</p></div>
       </section>
 
-      <section class="management-section operation-section" id="operacao">
+      <section class="management-section operation-section dashboard-view" id="operacao" data-dashboard-view tabindex="-1" aria-label="Operação" hidden>
         <div class="section-heading"><div><span class="section-kicker">OPERAÇÃO REAL</span><h2>Horários, pausas e regiões</h2><p>Automatize a disponibilidade da loja e cobre a entrega correta para cada bairro.</p></div><span class="operation-live" id="operacaoStatus">Verificando operação...</span></div>
         <div class="operation-grid">
           <article class="dashboard-card operation-card">
@@ -233,6 +266,10 @@
           <form id="regiaoForm" class="region-form"><div class="field"><label for="regiaoBairro">Bairro</label><input id="regiaoBairro" maxlength="100" required/></div><div class="field"><label for="regiaoCidade">Cidade</label><input id="regiaoCidade" maxlength="100" required/></div><div class="field"><label for="regiaoUf">UF</label><input id="regiaoUf" maxlength="2" pattern="[A-Za-z]{2}" required/></div><div class="field"><label for="regiaoTaxa">Taxa</label><input id="regiaoTaxa" min="0" step="0.01" value="0" type="number" required/></div><div class="field"><label for="regiaoMinimo">Pedido mínimo</label><input id="regiaoMinimo" min="0" step="0.01" value="0" type="number" required/></div><div class="field"><label for="regiaoTempoMin">Previsão mín.</label><input id="regiaoTempoMin" min="5" max="240" value="25" type="number" required/></div><div class="field"><label for="regiaoTempoMax">Previsão máx.</label><input id="regiaoTempoMax" min="5" max="300" value="45" type="number" required/></div><button class="btn" type="submit">Adicionar região</button></form>
           <div class="region-list" id="regioesEmpresa"><p class="empty">Nenhuma região específica cadastrada.</p></div>
         </article>
+        <article class="dashboard-card operation-card stock-history-card">
+          <div class="section-heading"><div><h3>Movimentações de estoque</h3><p>Histórico automático de entradas e saídas dos produtos controlados.</p></div><button class="btn-mini secundario" id="atualizarEstoqueMovimentos" type="button">Atualizar</button></div>
+          <div class="stock-history" id="estoqueMovimentos"><p class="empty">Nenhuma movimentação registrada.</p></div>
+        </article>
         <div class="operation-grid">
           <article class="dashboard-card operation-card">
             <h3>Solicitações de cancelamento</h3><p class="card-help">Analise os pedidos antes de aprovar. Pagamentos online confirmados entram na fila de reembolso.</p>
@@ -245,13 +282,13 @@
         </div>
       </section>
 
-      <section class="management-section" id="financeiro">
+      <section class="management-section dashboard-view" id="financeiro" data-dashboard-view tabindex="-1" aria-label="Financeiro" hidden>
         <div class="section-heading"><div><span class="section-kicker">FINANCEIRO</span><h2>Resumo de repasses</h2><p>Acompanhe vendas, taxa da plataforma, saldo líquido e pendências.</p></div><label class="finance-period">Período <select id="financeiroPeriodo"><option value="7">7 dias</option><option value="30" selected>30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option></select></label></div>
         <div class="finance-grid" id="financeiroResumo"><article><small>Vendas brutas</small><strong id="financeBruto">R$ 0,00</strong></article><article><small>Taxa da plataforma</small><strong id="financeTaxa">R$ 0,00</strong></article><article class="highlight"><small>Saldo líquido estimado</small><strong id="financeLiquido">R$ 0,00</strong></article><article><small>Online pendente</small><strong id="financePendente">R$ 0,00</strong></article><article><small>Reembolsos pendentes</small><strong id="financeReembolsos">0</strong></article><article><small>Pedidos entregues</small><strong id="financeEntregues">0</strong></article></div>
         <p class="finance-note" id="financeNota">Valores estimados; a conciliação final depende do provedor de pagamento.</p>
       </section>
 
-      <section class="management-section" id="configuracoes">
+      <section class="management-section dashboard-view" id="configuracoes" data-dashboard-view tabindex="-1" aria-label="Configurações" hidden>
         <div class="section-heading"><div><span class="section-kicker">SUA LOJA</span><h2>Configurações</h2><p>Defina atendimento, entrega e identidade visual.</p></div></div>
         <article class="dashboard-card settings-card">
           <form id="lojaForm">
@@ -282,15 +319,15 @@
   </div>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/app-utils.js?v=2.6.1"></script>
-  <script src="js/supabase.js?v=2.6.1"></script>
-  <script src="js/media-uploader.js?v=3.4.0"></script>
-  <script src="js/config.js?v=3.1.0"></script>
-  <script src="js/monitoring.js?v=3.1.0"></script>
-  <script src="js/notifications.js?v=3.1.0"></script>
-  <script src="js/empresa-dashboard.js?v=3.5.0"></script>
-  <script src="js/operacao-empresa.js?v=3.5.0"></script>
-  <script src="js/site-enhancements.js?v=2.6.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
+  <script src="js/app-utils.js?v=4.2.0"></script>
+  <script src="js/supabase.js?v=4.2.0"></script>
+  <script src="js/media-uploader.js?v=4.2.0"></script>
+  <script src="js/config.js?v=4.2.0"></script>
+  <script src="js/monitoring.js?v=4.2.0"></script>
+  <script src="js/notifications.js?v=4.2.0"></script>
+  <script src="js/empresa-dashboard.js?v=4.2.0"></script>
+  <script src="js/operacao-empresa.js?v=4.2.0"></script>
+  <script src="js/site-enhancements.js?v=4.2.0"></script>
 </body>
 </html>

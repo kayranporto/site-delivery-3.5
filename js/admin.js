@@ -555,7 +555,7 @@ async function abrirDetalhesPedido(pedidoResumo) {
         const linha = elemento("div", "order-product");
         const info = elemento("div");
         const adicionais = Array.isArray(item.adicionais) ? item.adicionais.map((adicional) => adicional.nome || adicional).join(", ") : "";
-        info.append(elemento("strong", "", item.nome_produto || "Produto"));
+        info.append(elemento("strong", "", `${item.nome_produto || "Produto"}${item.variante_nome ? ` • ${item.variante_nome}` : ""}`));
         if (adicionais || item.observacao) info.append(elemento("small", "", [adicionais, item.observacao].filter(Boolean).join(" • ")));
         linha.append(elemento("strong", "", `${item.quantidade}×`), info, elemento("strong", "", App.dinheiro(Number(item.preco_unitario || 0) * Number(item.quantidade || 0))));
         itens.append(linha);

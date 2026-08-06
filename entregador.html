@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com 'sha256-u0u1ecLVPYNekrgEx+XAUkD4bQUKUR6DUioTn79RARQ='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; worker-src 'self' blob:; manifest-src 'self'; form-action 'self'; upgrade-insecure-requests"/>
+  <meta name="referrer" content="strict-origin-when-cross-origin"/>
   <meta name="theme-color" content="#111827"/>
   <meta name="description" content="Painel do entregador Multi Delivery para aceitar e acompanhar entregas em tempo real."/>
   <title>Painel do entregador | Multi Delivery</title>
@@ -11,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/entregador.css?v=3.1.0"/>
-  <link rel="stylesheet" href="css/accessibility.css?v=2.6.1"/>
-  <link rel="stylesheet" href="css/enhancements.css?v=3.1.0"/>
+  <link rel="stylesheet" href="css/entregador.css?v=4.2.0"/>
+  <link rel="stylesheet" href="css/accessibility.css?v=4.2.0"/>
+  <link rel="stylesheet" href="css/enhancements.css?v=4.2.0"/>
 </head>
 <body>
   <noscript>Este painel precisa de JavaScript habilitado.</noscript>
@@ -47,7 +49,7 @@
 
     <div id="entregadorApp" hidden>
       <section class="driver-hero">
-        <div><span class="driver-kicker">OPERAÇÃO EM TEMPO REAL</span><h1>Olá, <span id="nomeEntregador">entregador</span>!</h1><p>Fique online, aceite uma rota e compartilhe sua localização durante a entrega.</p></div>
+        <div><span class="driver-kicker">OPERAÇÃO EM TEMPO REAL</span><h2 class="driver-title">Olá, <span id="nomeEntregador">entregador</span>!</h2><p>Fique online, aceite uma rota e compartilhe sua localização durante a entrega.</p></div>
         <label class="online-switch"><input id="entregadorOnline" type="checkbox"/><span></span><div><small>SEU STATUS</small><strong id="textoEntregadorOnline">Offline</strong></div></label>
       </section>
 
@@ -70,12 +72,12 @@
     </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/app-utils.js?v=2.6.1"></script>
-  <script src="js/supabase.js?v=2.6.1"></script>
-  <script src="js/config.js?v=3.1.0"></script>
-  <script src="js/monitoring.js?v=3.1.0"></script>
-  <script src="js/notifications.js?v=3.1.0"></script>
-  <script src="js/entregador.js?v=3.1.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
+  <script src="js/app-utils.js?v=4.2.0"></script>
+  <script src="js/supabase.js?v=4.2.0"></script>
+  <script src="js/config.js?v=4.2.0"></script>
+  <script src="js/monitoring.js?v=4.2.0"></script>
+  <script src="js/notifications.js?v=4.2.0"></script>
+  <script src="js/entregador.js?v=4.2.0"></script>
 </body>
 </html>

@@ -1,0 +1,16 @@
+{
+  "name": "multi-delivery",
+  "version": "4.2.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node scripts/check-project.js",
+    "verify": "npm run check && npm test",
+    "package": "bash scripts/package-release.sh",
+    "check:edge": "tsc -p tsconfig.edge.json",
+    "configure:auth:no-confirm": "bash scripts/configurar-auth-sem-confirmacao.sh"
+  }
+}

@@ -86,7 +86,7 @@ function cardMinha(pedido) {
     const meta = elemento("div", "delivery-meta");
     meta.append(elemento("span", `status-chip ${pedido.status === "saiu_para_entrega" ? "route" : ""}`, textoStatus(pedido.status)), elemento("span", "", pedido.cliente_nome || "Cliente"), elemento("span", "", pedido.cliente_telefone || "Telefone não informado"), elemento("span", "", App.dinheiro(pedido.total)));
     info.append(meta, elemento("p", "delivery-address", pedido.endereco));
-    const itens = (pedido.pedido_itens || []).map((item) => `${item.quantidade}x ${item.nome_produto}`).join(" • ");
+    const itens = (pedido.pedido_itens || []).map((item) => `${item.quantidade}x ${item.nome_produto}${item.variante_nome ? ` • ${item.variante_nome}` : ""}`).join(" • ");
     if (itens) info.append(elemento("p", "delivery-address", itens));
 
     const acoes = elemento("div", "delivery-actions");

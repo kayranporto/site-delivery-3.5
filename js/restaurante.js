@@ -189,6 +189,22 @@ async function carregarProdutos() {
 
     if (error) throw new Error(error.message);
     produtos = Array.isArray(data) ? data : [];
+    const ids = produtos.map((produto) => String(produto.id));
+    if (ids.length) {
+        const { data: variantes, error: erroVariantes } = await window.db.from("produto_variantes")
+            .select("id,produto_id,nome,preco,promocao,ordem")
+            .in("produto_id", ids)
+            .eq("ativo", true)
+            .order("ordem");
+        if (erroVariantes) throw new Error(erroVariantes.message);
+        const porProduto = new Map();
+        (variantes || []).forEach((variante) => {
+            const chave = String(variante.produto_id);
+            if (!porProduto.has(chave)) porProduto.set(chave, []);
+            porProduto.get(chave).push(variante);
+        });
+        produtos = produtos.map((produto) => ({ ...produto, variantes: porProduto.get(String(produto.id)) || [] }));
+    }
     renderizarProdutos(produtos);
 }
 
@@ -206,7 +222,8 @@ function renderizarProdutos(lista) {
     const fragmento = document.createDocumentFragment();
     lista.forEach((produto) => {
         const precoPromocional = Number(produto.promocao || 0);
-        const preco = precoPromocional > 0 ? precoPromocional : Number(produto.preco || 0);
+        const precosVariantes = (produto.variantes || []).map((variante) => Number(variante.promocao || 0) > 0 ? Number(variante.promocao) : Number(variante.preco || 0)).filter(Number.isFinite);
+        const preco = precosVariantes.length ? Math.min(...precosVariantes) : (precoPromocional > 0 ? precoPromocional : Number(produto.preco || 0));
         const card = document.createElement("article");
         card.className = "produto-card";
         card.dataset.id = String(produto.id);
@@ -223,7 +240,7 @@ function renderizarProdutos(lista) {
         texto.textContent = produto.descricao || "";
         info.append(titulo, texto);
 
-        if (precoPromocional > 0) {
+        if (!precosVariantes.length && precoPromocional > 0) {
             const antigo = document.createElement("small");
             antigo.style.textDecoration = "line-through";
             antigo.textContent = dinheiro(produto.preco);
@@ -231,7 +248,7 @@ function renderizarProdutos(lista) {
         }
 
         const valor = document.createElement("strong");
-        valor.textContent = dinheiro(preco);
+        valor.textContent = `${precosVariantes.length ? "A partir de " : ""}${dinheiro(preco)}`;
         info.append(valor);
         card.append(info);
         fragmento.append(card);

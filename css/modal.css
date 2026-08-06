@@ -168,3 +168,4 @@ textarea{
 
 }.grupo-adicional{border:0;padding:0;margin:0 0 18px}.grupo-adicional legend{font-weight:700;font-size:1rem;margin-bottom:2px}.grupo-adicional>small{display:block;color:#666;margin-bottom:8px}
 .modal-feedback{margin:0 0 14px;padding:11px 13px;color:#971c28;background:#ffe8eb;border:1px solid #ffc9cf;border-radius:10px;font-size:.92rem;font-weight:600}
+#blocoVariantes{margin:8px 0 20px}.lista-variantes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.variante-opcao{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 13px;border:1px solid #dedfe3;border-radius:12px;cursor:pointer}.variante-opcao:has(input:checked){border-color:#EA1D2C;box-shadow:0 0 0 2px rgba(234,29,44,.12)}.variante-opcao input{accent-color:#EA1D2C}.variante-opcao span{font-size:.92rem;font-weight:700}.variante-opcao small{color:#666;font-size:.8rem}@media(max-width:520px){.lista-variantes{grid-template-columns:1fr}}

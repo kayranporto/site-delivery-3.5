@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300">
-  <rect width="520" height="300" rx="32" fill="#fff" opacity=".12"/>
-  <g transform="translate(260 150) rotate(-10)">
-    <rect x="-155" y="-70" width="310" height="140" rx="24" fill="#F59E0B"/>
-    <circle cx="-155" cy="0" r="24" fill="#0F766E"/><circle cx="155" cy="0" r="24" fill="#0F766E"/>
-    <text x="0" y="10" text-anchor="middle" font-family="Arial,sans-serif" font-size="52" font-weight="700" fill="#0B5D57">20% OFF</text>
-  </g>
-</svg>

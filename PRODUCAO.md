@@ -1,31 +1,98 @@
-# Publicação segura — Multi Delivery 3.5
+# Publicação segura — Multi Delivery 4.2.0
 
-## Antes de publicar
+## 1. Gate de release
 
-1. Faça um backup do banco no Supabase e confirme que a restauração está disponível.
-2. Execute as migrações em ordem até `supabase/migrations/013_operacao_real.sql`.
-3. Confirme que nenhuma chave `service_role` aparece nos arquivos publicados.
-4. Rode `npm test` na raiz do projeto.
-5. Teste em uma conta de cliente, restaurante, entregador e administrador.
+```bash
+npm ci
+npm run verify
+npm run check:edge
+npm run package
+```
 
-## Teste rápido obrigatório
+O release somente pode avançar com todos os comandos aprovados. O empacotamento exclui `.git`, `node_modules`, releases anteriores e ZIPs antigos.
 
-- Cadastre um produto com estoque controlado e finalize um pedido.
-- Confirme que o estoque baixou e que um pedido acima do saldo foi recusado.
-- Solicite um cancelamento e aprove pelo painel do restaurante; confirme a devolução do estoque.
-- Cadastre uma região, selecione um endereço do bairro e confira taxa, mínimo e previsão no checkout.
-- Salve horários e confirme que a loja fecha automaticamente fora da agenda.
-- Entregue um pedido com fidelidade ativa e confira os pontos na área do cliente.
-- Abra um chamado e responda na administração.
-- Simule um reembolso e confirme a auditoria e a notificação do cliente.
+## 2. Banco de dados
 
-## Rotina operacional
+1. Gere backup e documente o procedimento de restauração.
+2. Aplique as migrations pendentes em ordem: 014, 015 e 016.
+3. Execute Security Advisor e Performance Advisor.
+4. Confirme RLS nas tabelas públicas, inclusive `empresa_unidades`, `produto_variantes` e `estoque_movimentos`.
+5. Teste RPCs com contas separadas de cliente, restaurante, entregador e administrador.
+6. Valide que `private.criar_pedido_impl` não é executável diretamente por clientes.
 
-- Diário: conferir a seção **Suporte e pendências** da administração.
-- Semanal: revisar produtos com estoque baixo, cancelamentos e pagamentos pendentes.
-- Mensal: exportar relatórios, revisar contas administrativas e testar restauração de backup.
-- Antes de cada versão: trocar a versão do cache em `sw.js` para evitar arquivos antigos no PWA.
+A migration 016 adiciona variações, cozinha, idempotência do checkout, auditoria de estoque e a fundação multiunidade.
 
-## Monitoramento
+## 3. Edge Functions
 
-O frontend registra erros na infraestrutura já configurada em `js/monitoring.js`. O painel administrativo reúne chamados, cancelamentos, reembolsos, estoque baixo e lojas em pausa. Integrações externas de pagamento devem confirmar pagamento e reembolso apenas por função de servidor/webhook; nunca pelo navegador.
+Funções obrigatórias para pagamento online:
+
+- `criar-pagamento`;
+- `mercado-pago-webhook`;
+- `processar-reembolso`.
+
+`enviar-push` é opcional. Configure segredos somente no ambiente de funções; nunca no frontend.
+
+## 4. Testes obrigatórios de sandbox
+
+1. Pagamento aprovado normalmente.
+2. Webhook repetido.
+3. Webhooks fora de ordem.
+4. Cancelamento antes da confirmação do pagamento.
+5. Pagamento aprovado após cancelamento.
+6. Reembolso repetido.
+7. Valor ou moeda divergente.
+8. Duas compras concorrentes da última unidade.
+9. Alteração de preço e de variação durante o checkout.
+10. Duplo clique ou reenvio do mesmo checkout, confirmando um único pedido.
+11. Pedido recebido → preparo → pronto → aceite do entregador → entrega.
+12. Restaurante tentando concluir entrega já atribuída a entregador.
+13. Cliente, restaurante, entregador e administrador tentando acessar dados de outro papel.
+
+Registre evidências e resultados antes de usar credenciais reais.
+
+## 5. Autenticação
+
+- desative **Confirm email** somente se o cadastro imediato for decisão definitiva;
+- ative proteção contra senhas vazadas;
+- configure Cloudflare Turnstile ou hCaptcha;
+- ajuste rate limits de cadastro, login e recuperação;
+- configure URLs exatas de produção;
+- preserve confirmação segura para troca de e-mail;
+- mantenha recuperação de senha por e-mail operacional.
+
+## 6. Hospedagem
+
+Confirme por inspeção HTTP real:
+
+- Content-Security-Policy;
+- Strict-Transport-Security;
+- X-Content-Type-Options;
+- Referrer-Policy;
+- Permissions-Policy;
+- proteção contra framing;
+- cache correto do service worker 4.2.0.
+
+## 7. Observabilidade
+
+Configure alertas para:
+
+- erros das Edge Functions;
+- pagamentos divergentes;
+- reembolsos em `falhou`;
+- pedidos em preparo atrasados;
+- crescimento anormal de cadastros;
+- indisponibilidade do site e do backend;
+- produtos com estoque negativo ou divergente.
+
+## 8. Aprovação final
+
+- [ ] migrations 014, 015 e 016 aplicadas;
+- [ ] 33 testes automatizados aprovados;
+- [ ] Edge Functions publicadas e segredos configurados;
+- [ ] webhook validado no sandbox;
+- [ ] fluxo completo da cozinha e entrega testado;
+- [ ] backup e restauração testados;
+- [ ] CAPTCHA e rate limits configurados;
+- [ ] cabeçalhos confirmados no domínio;
+- [ ] política de privacidade revisada;
+- [ ] responsáveis operacionais definidos.

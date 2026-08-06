@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true
+  },
+  "files": [
+    "scripts/types/edge-shims.d.ts",
+    "supabase/functions/_shared/cors.ts",
+    "supabase/functions/criar-pagamento/index.ts",
+    "supabase/functions/mercado-pago-webhook/index.ts",
+    "supabase/functions/processar-reembolso/index.ts",
+    "supabase/functions/enviar-push/index.ts"
+  ]
+}

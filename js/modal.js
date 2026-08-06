@@ -7,6 +7,8 @@ const modalImagem = document.getElementById("modalImagem");
 const modalNome = document.getElementById("modalNome");
 const modalDescricao = document.getElementById("modalDescricao");
 const listaAdicionais = document.getElementById("listaAdicionais");
+const blocoVariantes = document.getElementById("blocoVariantes");
+const listaVariantes = document.getElementById("listaVariantes");
 const observacao = document.getElementById("observacao");
 const menosQtd = document.getElementById("menosQtd");
 const maisQtd = document.getElementById("maisQtd");
@@ -17,6 +19,8 @@ const confirmarProduto = document.getElementById("confirmarProduto");
 let produtoAtual = null;
 let quantidade = 1;
 let gruposAtuais = [];
+let variantesAtuais = [];
+let varianteSelecionada = null;
 let elementoFocoAnterior = null;
 let adicionaisCarregados = false;
 let solicitacaoModal = 0;
@@ -43,6 +47,15 @@ function precoProduto(produto) {
     return promocao > 0 ? promocao : Number(produto?.preco || 0);
 }
 
+function precoVariante(variante) {
+    const promocao = Number(variante?.promocao || 0);
+    return promocao > 0 ? promocao : Number(variante?.preco || 0);
+}
+
+function precoBaseAtual() {
+    return varianteSelecionada ? precoVariante(varianteSelecionada) : precoProduto(produtoAtual);
+}
+
 function fechar() {
     if (!modal.classList.contains("aberto")) return;
     solicitacaoModal += 1;
@@ -51,6 +64,43 @@ function fechar() {
     modal.setAttribute("inert", "");
     document.body.style.overflow = "";
     elementoFocoAnterior?.focus();
+}
+
+async function carregarVariantes(produtoId, solicitacao) {
+    variantesAtuais = [];
+    varianteSelecionada = null;
+    blocoVariantes.hidden = true;
+    listaVariantes.replaceChildren();
+    const { data, error } = await window.db.from("produto_variantes")
+        .select("id,nome,preco,promocao,ordem,ativo")
+        .eq("produto_id", produtoId)
+        .eq("ativo", true)
+        .order("ordem")
+        .order("nome");
+    if (error) throw error;
+    if (solicitacao !== solicitacaoModal) return false;
+    variantesAtuais = data || [];
+    if (!variantesAtuais.length) return true;
+
+    blocoVariantes.hidden = false;
+    listaVariantes.className = "lista-variantes";
+    variantesAtuais.forEach((variante, indice) => {
+        const label = document.createElement("label");
+        label.className = "variante-opcao";
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "produto-variante";
+        input.value = String(variante.id);
+        input.checked = indice === 0;
+        const texto = document.createElement("span");
+        texto.textContent = variante.nome || "Opção";
+        const preco = document.createElement("small");
+        preco.textContent = App.dinheiro(precoVariante(variante));
+        label.append(input, texto, preco);
+        listaVariantes.append(label);
+    });
+    varianteSelecionada = variantesAtuais[0] || null;
+    return true;
 }
 
 async function carregarAdicionais(produtoId, solicitacao) {
@@ -154,6 +204,8 @@ async function abrirModalProduto(produto) {
     produtoAtual = produto;
     quantidade = 1;
     gruposAtuais = [];
+    variantesAtuais = [];
+    varianteSelecionada = null;
     adicionaisCarregados = false;
     elementoFocoAnterior = document.activeElement;
     observacao.value = "";
@@ -172,9 +224,13 @@ async function abrirModalProduto(produto) {
     atualizarPreco();
 
     try {
-        const carregado = await carregarAdicionais(produto.id, solicitacao);
+        const [variantesCarregadas, adicionaisCarregadosOk] = await Promise.all([
+            carregarVariantes(produto.id, solicitacao),
+            carregarAdicionais(produto.id, solicitacao)
+        ]);
         if (solicitacao !== solicitacaoModal || !modal.classList.contains("aberto")) return;
-        if (!carregado) return;
+        if (!variantesCarregadas || !adicionaisCarregadosOk) return;
+        atualizarPreco();
         confirmarProduto.disabled = false;
     } catch (error) {
         console.error("Erro ao carregar adicionais:", error);
@@ -190,7 +246,7 @@ async function abrirModalProduto(produto) {
 
 function atualizarPreco() {
     if (!produtoAtual) return;
-    let total = precoProduto(produtoAtual);
+    let total = precoBaseAtual();
     listaAdicionais.querySelectorAll("input:checked").forEach((input) => {
         total += Number(input.dataset.preco || 0);
     });
@@ -213,6 +269,13 @@ function validarGrupos() {
     }
     return true;
 }
+
+listaVariantes.addEventListener("change", (event) => {
+    const input = event.target.closest("input[name='produto-variante']");
+    if (!input) return;
+    varianteSelecionada = variantesAtuais.find((item) => String(item.id) === input.value) || null;
+    atualizarPreco();
+});
 
 listaAdicionais.addEventListener("change", (event) => {
     const input = event.target.closest("input[data-grupo-id]");
@@ -261,7 +324,9 @@ confirmarProduto.addEventListener("click", () => {
         id: String(produtoAtual.id),
         nome: produtoAtual.nome,
         imagem: produtoAtual.imagem || "assets/produto-padrao.svg",
-        preco: precoProduto(produtoAtual),
+        preco: precoBaseAtual(),
+        variante_id: varianteSelecionada ? String(varianteSelecionada.id) : null,
+        variante_nome: varianteSelecionada?.nome || null,
         quantidade,
         observacao: observacao.value.trim().slice(0, 300),
         adicionais

@@ -169,6 +169,12 @@ function criarResumo(item) {
     titulo.textContent = `${item.quantidade}x ${item.nome || "Produto"}`;
     info.append(titulo);
 
+    if (item.variante_nome) {
+        const variante = document.createElement("small");
+        variante.textContent = item.variante_nome;
+        info.append(variante);
+    }
+
     if (item.indisponivel) {
         const aviso = document.createElement("strong");
         aviso.className = "item-indisponivel";
@@ -230,6 +236,7 @@ function snapshotValores() {
         } : null,
         itens: carrinho.map((item) => ({
             id: String(item.id),
+            variante: item.variante_id ? String(item.variante_id) : null,
             preco: Number(item.preco || 0),
             adicionais: (item.adicionais || []).map((adicional) => [String(adicional.id), Number(adicional.preco || 0)])
         }))
@@ -242,7 +249,7 @@ async function sincronizarValores() {
     const produtoIds = [...new Set(carrinho.map((item) => String(item.id)).filter(Boolean))];
     const adicionalIds = [...new Set(carrinho.flatMap((item) => (item.adicionais || []).map((adicional) => String(adicional.id))).filter(Boolean))];
 
-    const [empresaResposta, produtosResposta, adicionaisResposta] = await Promise.all([
+    const [empresaResposta, produtosResposta, adicionaisResposta, variantesResposta] = await Promise.all([
         window.db.from("empresas_catalogo")
             .select("id,nome,taxa_entrega,pedido_minimo,status,cidade_atendimento,uf_atendimento,bairros_atendidos,tempo_estimado_min,tempo_estimado_max")
             .eq("id", String(carrinhoMeta.empresa_id))
@@ -252,12 +259,14 @@ async function sincronizarValores() {
             .in("id", produtoIds),
         adicionalIds.length
             ? window.db.from("adicionais").select("id,nome,preco,ativo").in("id", adicionalIds)
-            : Promise.resolve({ data: [], error: null })
+            : Promise.resolve({ data: [], error: null }),
+        window.db.from("produto_variantes").select("id,produto_id,nome,preco,promocao,ativo").in("produto_id", produtoIds).eq("ativo", true)
     ]);
 
     if (empresaResposta.error) throw empresaResposta.error;
     if (produtosResposta.error) throw produtosResposta.error;
     if (adicionaisResposta.error) throw adicionaisResposta.error;
+    if (variantesResposta.error) throw variantesResposta.error;
     if (!empresaResposta.data) throw new Error("O restaurante não está publicado ou não foi encontrado.");
 
     const empresa = empresaResposta.data;
@@ -278,13 +287,29 @@ async function sincronizarValores() {
 
     const produtosServidor = new Map((produtosResposta.data || []).map((produto) => [String(produto.id), produto]));
     const adicionaisServidor = new Map((adicionaisResposta.data || []).map((adicional) => [String(adicional.id), adicional]));
+    const variantesPorProduto = new Map();
+    (variantesResposta.data || []).forEach((variante) => {
+        const chave = String(variante.produto_id);
+        if (!variantesPorProduto.has(chave)) variantesPorProduto.set(chave, []);
+        variantesPorProduto.get(chave).push(variante);
+    });
     carrinho.forEach((item) => {
         const produto = produtosServidor.get(String(item.id));
         item.indisponivel = !produto || produto.disponivel === false;
         if (produto) {
             item.nome = produto.nome || item.nome;
             item.imagem = produto.imagem || item.imagem;
-            item.preco = Number(produto.promocao || 0) > 0 ? Number(produto.promocao) : Number(produto.preco || 0);
+            const variantesAtivas = variantesPorProduto.get(String(item.id)) || [];
+            const variante = item.variante_id ? variantesAtivas.find((opcao) => String(opcao.id) === String(item.variante_id)) : null;
+            if (variantesAtivas.length && !variante) item.indisponivel = true;
+            if (variante) {
+                item.variante_nome = variante.nome || item.variante_nome;
+                item.preco = Number(variante.promocao || 0) > 0 ? Number(variante.promocao) : Number(variante.preco || 0);
+            } else if (!variantesAtivas.length) {
+                item.variante_id = null;
+                item.variante_nome = null;
+                item.preco = Number(produto.promocao || 0) > 0 ? Number(produto.promocao) : Number(produto.preco || 0);
+            }
         }
         item.adicionais = (item.adicionais || []).map((adicional) => {
             const servidor = adicionaisServidor.get(String(adicional.id));
@@ -362,6 +387,26 @@ function valorTroco() {
     return Number.isFinite(numero) ? numero : null;
 }
 
+
+function limparCheckoutConcluido() {
+    sessionStorage.removeItem("checkoutIdempotencia");
+    sessionStorage.removeItem("checkoutAssinatura");
+    if (window.CartStore) window.CartStore.limpar();
+    else { localStorage.removeItem("carrinho"); localStorage.removeItem("carrinhoMeta"); }
+}
+
+function chaveIdempotenciaCheckout() {
+    const assinatura = JSON.stringify({ empresa: carrinhoMeta?.empresa_id, itens: carrinho.map((item) => [item.id, item.variante_id || null, item.quantidade, item.observacao || "", (item.adicionais || []).map((adicional) => adicional.id).sort()]) });
+    const chaveAssinatura = "checkoutAssinatura";
+    const chaveId = "checkoutIdempotencia";
+    if (sessionStorage.getItem(chaveAssinatura) !== assinatura) {
+        sessionStorage.setItem(chaveAssinatura, assinatura);
+        sessionStorage.setItem(chaveId, crypto.randomUUID());
+    }
+    if (!sessionStorage.getItem(chaveId)) sessionStorage.setItem(chaveId, crypto.randomUUID());
+    return sessionStorage.getItem(chaveId);
+}
+
 async function finalizarPedido() {
     if (!carrinho.length || !itensValidos() || !carrinhoMeta?.empresa_id) return avisarCheckout("Seu carrinho está vazio ou possui dados inválidos.");
 
@@ -408,6 +453,7 @@ async function finalizarPedido() {
     App.definirCarregando(btnFinalizar, true, "Enviando pedido...");
     const itens = carrinho.map((item) => ({
         produto_id: String(item.id),
+        variante_id: item.variante_id ? String(item.variante_id) : null,
         quantidade: Math.min(99, Math.max(1, Number.parseInt(item.quantidade, 10) || 1)),
         observacao: String(item.observacao || "").trim().slice(0, 300) || null,
         adicionais: (Array.isArray(item.adicionais) ? item.adicionais : []).map((adicional) => ({ id: String(adicional.id) }))
@@ -421,7 +467,8 @@ async function finalizarPedido() {
             p_observacoes: observacoesFinais,
             p_cupom: cupomAplicado || null,
             p_itens: itens,
-            p_agendado_para: null
+            p_agendado_para: null,
+            p_chave_cliente: chaveIdempotenciaCheckout()
         });
         if (erroPedido) throw erroPedido;
         if (!pedidoCriado?.id) throw new Error("O banco não retornou o pedido criado.");
@@ -434,14 +481,13 @@ async function finalizarPedido() {
         if (erroLeitura) throw erroLeitura;
 
         App.salvarJSON("pedidoAtual", pedidoBanco);
-        if (window.CartStore) window.CartStore.limpar();
-        else { localStorage.removeItem("carrinho"); localStorage.removeItem("carrinhoMeta"); }
         if (pagamento === "Online") {
             const { error: erroModalidade } = await window.db.rpc("pedido_definir_pagamento_online", { p_pedido_id: pedidoBanco.id });
             if (erroModalidade) throw erroModalidade;
             pedidoBanco.pagamento_modalidade = "online";
             App.salvarJSON("pedidoAtual", pedidoBanco);
             const { data: pagamentoCriado, error: erroPagamento } = await window.db.functions.invoke("criar-pagamento", { body: { pedido_id: pedidoBanco.id } });
+            limparCheckoutConcluido();
             if (erroPagamento || !pagamentoCriado?.checkout_url) {
                 avisarCheckout("O pedido foi criado, mas o pagamento online não pôde ser iniciado. Você poderá tentar novamente no acompanhamento.", "info", "Pedido criado");
                 window.location.href = `acompanhamento.html?id=${encodeURIComponent(pedidoBanco.id)}`;
@@ -450,6 +496,7 @@ async function finalizarPedido() {
             window.location.href = pagamentoCriado.checkout_url;
             return;
         }
+        limparCheckoutConcluido();
         window.location.href = "pedido-sucesso.html";
     } catch (error) {
         console.error("Erro ao enviar pedido:", error);

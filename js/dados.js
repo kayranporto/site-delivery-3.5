@@ -242,6 +242,99 @@
         }
     });
 
+
+    async function exportarDadosPessoais() {
+        if (!usuarioAtual) return;
+        const botao = document.getElementById("exportarDados");
+        const status = document.getElementById("privacidadeStatus");
+        App.definirCarregando(botao, true, "Preparando...");
+        status.textContent = "Preparando arquivo...";
+        try {
+            const consultas = await Promise.all([
+                window.db.from("usuarios").select("*").eq("id", usuarioAtual.id).maybeSingle(),
+                window.db.from("enderecos").select("*").eq("usuario_id", usuarioAtual.id).order("created_at"),
+                window.db.from("pedidos").select("*,pedido_itens(*),historico_status_pedido(*)").eq("usuario_id", usuarioAtual.id).order("created_at"),
+                window.db.from("favoritos").select("*").eq("usuario_id", usuarioAtual.id).order("created_at"),
+                window.db.from("avaliacoes").select("*").eq("usuario_id", usuarioAtual.id).order("created_at"),
+                window.db.from("chamados_suporte").select("*").eq("usuario_id", usuarioAtual.id).order("created_at"),
+                window.db.from("notificacoes").select("*").eq("usuario_id", usuarioAtual.id).order("created_at")
+            ]);
+            const erro = consultas.find((resultado) => resultado.error)?.error;
+            if (erro) throw erro;
+            const pacote = {
+                exportado_em: new Date().toISOString(),
+                formato: "multi-delivery-account-export-v1",
+                conta: { id: usuarioAtual.id, email: usuarioAtual.email, criado_em: usuarioAtual.created_at },
+                perfil: consultas[0].data,
+                enderecos: consultas[1].data || [],
+                pedidos: consultas[2].data || [],
+                favoritos: consultas[3].data || [],
+                avaliacoes: consultas[4].data || [],
+                chamados_suporte: consultas[5].data || [],
+                notificacoes: consultas[6].data || []
+            };
+            const blob = new Blob([JSON.stringify(pacote, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `meus-dados-delivery-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.append(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            status.textContent = "Arquivo gerado. Guarde-o em local seguro.";
+            notificar("Exportação concluída", "Seus dados foram reunidos em um arquivo JSON.", "success");
+        } catch (erro) {
+            status.textContent = "Não foi possível concluir a exportação.";
+            notificar("Falha na exportação", App.mensagemErro(erro), "error");
+        } finally {
+            App.definirCarregando(botao, false);
+        }
+    }
+
+    async function solicitarExclusaoConta() {
+        if (!usuarioAtual) return;
+        const confirmado = window.AppConfirm
+            ? await window.AppConfirm({
+                titulo: "Solicitar exclusão da conta",
+                mensagem: "A solicitação será analisada. Registros que precisem ser mantidos por obrigação legal ou prevenção a fraudes poderão ser preservados pelo prazo aplicável.",
+                confirmar: "Enviar solicitação"
+            })
+            : confirm("Enviar solicitação de exclusão da conta para análise?");
+        if (!confirmado) return;
+        const botao = document.getElementById("solicitarExclusao");
+        const status = document.getElementById("privacidadeStatus");
+        App.definirCarregando(botao, true, "Enviando...");
+        try {
+            const { data: existente, error: consultaError } = await window.db.from("chamados_suporte")
+                .select("id,status").eq("usuario_id", usuarioAtual.id)
+                .eq("categoria", "conta").ilike("assunto", "Exclusão de conta%")
+                .in("status", ["aberto", "em_analise", "respondido"]).limit(1);
+            if (consultaError) throw consultaError;
+            if (existente?.length) {
+                status.textContent = "Já existe uma solicitação de exclusão em análise.";
+                return;
+            }
+            const { error } = await window.db.rpc("abrir_chamado_suporte", {
+                p_categoria: "conta",
+                p_assunto: "Exclusão de conta e dados pessoais",
+                p_mensagem: "Solicito a exclusão ou anonimização dos dados pessoais vinculados à minha conta, observadas as retenções legais e de segurança aplicáveis.",
+                p_pedido_id: null
+            });
+            if (error) throw error;
+            status.textContent = "Solicitação enviada. Acompanhe a resposta na área de suporte.";
+            notificar("Solicitação registrada", "A equipe analisará a exclusão e as retenções aplicáveis.", "success");
+        } catch (erro) {
+            status.textContent = "Não foi possível registrar a solicitação.";
+            notificar("Falha na solicitação", App.mensagemErro(erro), "error");
+        } finally {
+            App.definirCarregando(botao, false);
+        }
+    }
+
+    document.getElementById("exportarDados")?.addEventListener("click", exportarDadosPessoais);
+    document.getElementById("solicitarExclusao")?.addEventListener("click", solicitarExclusaoConta);
+
     addEventListener("beforeunload", () => { if (previewTemporario) URL.revokeObjectURL(previewTemporario); });
     carregarDados();
 })();

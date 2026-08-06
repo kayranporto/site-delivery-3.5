@@ -1,7 +1,7 @@
 "use strict";
 
-const CACHE = "multi-delivery-v18";
-const DYNAMIC_CACHE = "multi-delivery-dynamic-v15";
+const CACHE = "multi-delivery-v4.2.0";
+const DYNAMIC_CACHE = "multi-delivery-dynamic-v4.2.0";
 const SHELL = [
   "./",
   "./index.html",
@@ -12,19 +12,19 @@ const SHELL = [
   "./assets/produto-padrao.svg",
   "./assets/logo-restaurante.svg",
   "./assets/banner1.svg",
-  "./css/style.css?v=3.4.0",
-  "./css/paginas.css?v=2.6.1",
-  "./css/accessibility.css?v=2.6.1",
-  "./css/enhancements.css?v=3.4.0",
-  "./css/suporte.css?v=3.5.0",
-  "./js/app-utils.js?v=2.6.1",
-  "./js/config.js?v=3.1.0",
-  "./js/monitoring.js?v=3.1.0",
-  "./js/notifications.js?v=3.1.0",
-  "./js/favorites-sync.js?v=3.4.0",
-  "./js/home.js?v=3.4.0",
-  "./js/suporte.js?v=3.5.0",
-  "./js/site-enhancements.js?v=2.6.1"
+  "./css/style.css?v=4.2.0",
+  "./css/paginas.css?v=4.2.0",
+  "./css/accessibility.css?v=4.2.0",
+  "./css/enhancements.css?v=4.2.0",
+  "./css/suporte.css?v=4.2.0",
+  "./js/app-utils.js?v=4.2.0",
+  "./js/config.js?v=4.2.0",
+  "./js/monitoring.js?v=4.2.0",
+  "./js/notifications.js?v=4.2.0",
+  "./js/favorites-sync.js?v=4.2.0",
+  "./js/home.js?v=4.2.0",
+  "./js/suporte.js?v=4.2.0",
+  "./js/site-enhancements.js?v=4.2.0"
 ];
 
 self.addEventListener("install", (event) => {

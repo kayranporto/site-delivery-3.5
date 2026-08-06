@@ -37,6 +37,8 @@ function normalizarCarrinho() {
                 nome: String(item?.nome || "Produto").slice(0, 150),
                 imagem: String(item?.imagem || "assets/produto-padrao.svg"),
                 preco: Number(item?.preco || 0),
+                variante_id: item?.variante_id ? String(item.variante_id) : null,
+                variante_nome: item?.variante_nome ? String(item.variante_nome).slice(0, 100) : null,
                 quantidade,
                 adicionais,
                 observacao: String(item?.observacao || "").trim().slice(0, 300),
@@ -92,7 +94,7 @@ function fecharCarrinho() {
 
 function chaveProduto(produto) {
     const adicionais = (produto.adicionais || []).map((item) => String(item.id)).sort().join("-");
-    return `${produto.id}|${adicionais}|${produto.observacao || ""}`;
+    return `${produto.id}|${produto.variante_id || "sem-variante"}|${adicionais}|${produto.observacao || ""}`;
 }
 
 async function adicionarAoCarrinho(produto) {
@@ -117,6 +119,8 @@ async function adicionarAoCarrinho(produto) {
         nome: String(produto.nome || "Produto").slice(0, 150),
         imagem: String(produto.imagem || "assets/produto-padrao.svg"),
         preco: Number(produto.preco || 0),
+        variante_id: produto.variante_id ? String(produto.variante_id) : null,
+        variante_nome: produto.variante_nome ? String(produto.variante_nome).slice(0, 100) : null,
         quantidade,
         observacao: String(produto.observacao || "").trim().slice(0, 300),
         adicionais: (Array.isArray(produto.adicionais) ? produto.adicionais : []).filter((adicional) =>
@@ -188,6 +192,13 @@ function criarItem(item) {
     const titulo = document.createElement("h4");
     titulo.textContent = item.nome;
     info.append(titulo);
+
+    if (item.variante_nome) {
+        const variante = document.createElement("small");
+        variante.className = "adicionais";
+        variante.textContent = item.variante_nome;
+        info.append(variante);
+    }
 
     if (item.adicionais.length) {
         const adicionais = document.createElement("small");

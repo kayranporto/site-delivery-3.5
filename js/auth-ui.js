@@ -1,5 +1,23 @@
 "use strict";
 
+
+window.AuthPolicy = Object.freeze({
+    minLength: 8,
+    validar(senha) {
+        const valor = String(senha || "");
+        const requisitos = {
+            tamanho: valor.length >= 8,
+            letra: /[A-Za-zÀ-ÿ]/.test(valor),
+            numero: /\d/.test(valor)
+        };
+        return {
+            valida: Object.values(requisitos).every(Boolean),
+            requisitos,
+            mensagem: "A senha precisa ter pelo menos 8 caracteres, incluindo letra e número."
+        };
+    }
+});
+
 (function iniciarInterfaceAutenticacao() {
     const eyeOpen = `
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -81,14 +99,14 @@
         const atualizar = () => {
             const value = input.value;
             let score = 0;
-            if (value.length >= 6) score += 1;
+            if (value.length >= 8) score += 1;
             if (value.length >= 10) score += 1;
             if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score += 1;
             if (/\d/.test(value) && /[^A-Za-z0-9]/.test(value)) score += 1;
 
             meter.dataset.level = String(value ? Math.max(1, score) : 0);
             const labels = [
-                "Use ao menos 6 caracteres.",
+                "Use 8 caracteres, com letra e número.",
                 "Senha fraca",
                 "Senha razoável",
                 "Senha boa",

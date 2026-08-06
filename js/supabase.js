@@ -1,7 +1,7 @@
 "use strict";
 
 const SUPABASE_URL = "https://wzxsjxdbxonrmlmzufpv.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6eHNqeGRieG9ucm1sbXp1ZnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNjA2NzIsImV4cCI6MjEwMDkzNjY3Mn0.FWE89Blk5Y16r_WmeZRVq8ZSbySI7PaIMytck6NL8oY";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_MY-SAdXYgtX0euNoW4arHw_zlnZ3pcx";
 const SUPABASE_PROJECT_REF = "wzxsjxdbxonrmlmzufpv";
 
 (() => {
@@ -44,7 +44,7 @@ const SUPABASE_PROJECT_REF = "wzxsjxdbxonrmlmzufpv";
         if (!SUPABASE_URL.includes(`://${SUPABASE_PROJECT_REF}.supabase.co`)) {
             throw new Error("A URL do Supabase não corresponde ao projeto configurado.");
         }
-        window.db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        window.db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
             auth: {
                 persistSession: true,
                 autoRefreshToken: true,

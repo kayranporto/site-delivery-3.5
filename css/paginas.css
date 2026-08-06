@@ -272,3 +272,7 @@ th {
     .page-card, .item-card { padding: 20px 16px; border-radius: 18px; }
     .section-title-inline { align-items: stretch; flex-direction: column; }
 }
+
+.page-main--narrow{max-width:620px}.page-main--not-found{max-width:650px;padding-top:10vh}.not-found-icon{font-size:5rem}
+
+.auth-captcha{width:100%;min-height:65px;margin:14px 0 6px;overflow:hidden}.auth-captcha[hidden],.auth-captcha-note[hidden]{display:none!important}.auth-captcha-note{margin:0 0 12px;color:#6f7583;font-size:11px}

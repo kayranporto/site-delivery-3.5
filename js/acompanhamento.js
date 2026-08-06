@@ -59,7 +59,7 @@ function renderizarItens(pedido) {
         row.className = "item-track";
         const texto = document.createElement("div");
         const principal = document.createElement("strong");
-        principal.textContent = `${item.quantidade || 1}x ${item.nome_produto || "Produto"}`;
+        principal.textContent = `${item.quantidade || 1}x ${item.nome_produto || "Produto"}${item.variante_nome ? ` • ${item.variante_nome}` : ""}`;
         texto.append(principal);
         const adicionais = Array.isArray(item.adicionais) ? item.adicionais : [];
         if (adicionais.length) {
@@ -112,11 +112,12 @@ function renderizarAcoes(status) {
 function render(pedido) {
     pedidoAtual = pedido;
     const status = pedido.status || "recebido";
+    const pronto = status === "preparando" && Boolean(pedido.pronto_em);
     document.getElementById("tituloPedido").textContent = `Pedido #${pedido.numero || String(pedido.id).slice(0, 8)}`;
-    document.getElementById("statusAtual").textContent = nomesStatus[status] || "Pedido recebido";
+    document.getElementById("statusAtual").textContent = pronto ? "Pronto para retirada" : nomesStatus[status] || "Pedido recebido";
     document.getElementById("mensagemStatus").textContent = pedido.cancelamento_status === "solicitado"
         ? "Seu cancelamento está sendo analisado pelo restaurante"
-        : mensagens[status] || "Acompanhe seu pedido";
+        : pronto ? "Seu pedido está pronto e aguarda o entregador" : mensagens[status] || "Acompanhe seu pedido";
     document.getElementById("nomeEmpresa").textContent = pedido.empresa_nome || "Restaurante";
     const minimo = Number(pedido.previsao_min || 25);
     const maximo = Number(pedido.previsao_max || 45);
@@ -124,7 +125,7 @@ function render(pedido) {
         ? new Date(pedido.agendado_para).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
         : status === "entregue"
         ? "Entregue"
-        : status === "cancelado" ? "Cancelado" : `${minimo}–${maximo} min`;
+        : status === "cancelado" ? "Cancelado" : pronto ? "Pronto" : `${minimo}–${maximo} min`;
     document.getElementById("enderecoPedido").textContent = pedido.endereco || "—";
     const pagamentoStatus = pedido.reembolso_status === "pendente"
         ? "reembolso pendente"
@@ -307,6 +308,9 @@ async function carregar() {
                 notificar(payload.new.status);
                 window.AppToast?.("Pedido atualizado", mensagens[payload.new.status], "success");
                 if (payload.new.status === "entregue") await carregarAvaliacao();
+            } else if (!pedidoAtual?.pronto_em && payload.new.pronto_em) {
+                notificar("preparando");
+                window.AppToast?.("Pedido pronto", "Seu pedido está pronto e aguarda retirada.", "success");
             }
         })
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "pedido_mensagens", filter: `pedido_id=eq.${id}` }, (payload) => { mensagensPedido.push(payload.new); renderizarMensagens(); })

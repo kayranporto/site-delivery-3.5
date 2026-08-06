@@ -1,0 +1,23 @@
+project_id = "multi-delivery"
+
+[functions.criar-pagamento]
+verify_jwt = true
+
+[functions.processar-reembolso]
+verify_jwt = true
+
+[functions.mercado-pago-webhook]
+verify_jwt = false
+
+[functions.enviar-push]
+verify_jwt = false
+
+[auth]
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+double_confirm_changes = true
+secure_password_change = true
+max_frequency = "1m"

@@ -30,7 +30,7 @@ button,a { -webkit-tap-highlight-color:transparent; }
 .pending-card>span { font-size:32px; }
 .pending-card p { margin:5px 0 0; color:#796437; font-size:12px; }
 .driver-hero { position:relative; display:flex; min-height:220px; align-items:center; justify-content:space-between; gap:30px; padding:36px; overflow:hidden; border-radius:28px; background:radial-gradient(circle at 80% 20%,rgba(255,89,100,.22),transparent 32%),linear-gradient(135deg,#161a25,#30384b); color:#fff; box-shadow:0 24px 55px rgba(19,23,34,.18); }
-.driver-hero h1 { margin:7px 0; font-size:clamp(28px,4vw,44px); }
+.driver-hero h1,.driver-hero .driver-title { margin:7px 0; font-size:clamp(28px,4vw,44px); }
 .driver-hero p { max-width:620px; margin:0; color:#c7ccda; font-size:13px; }
 .online-switch { display:flex; min-width:210px; align-items:center; gap:13px; padding:17px; border:1px solid rgba(255,255,255,.13); border-radius:18px; background:rgba(255,255,255,.08); cursor:pointer; }
 .online-switch input { position:absolute; opacity:0; }

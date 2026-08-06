@@ -8,6 +8,8 @@ let pedidos = [];
 let gruposAdicionais = [];
 let adicionaisEmpresa = [];
 let vinculosProdutoGrupo = [];
+let variantesProduto = [];
+let estoqueMovimentos = [];
 let cuponsEmpresa = [];
 let avaliacoesEmpresa = [];
 let filtroPeriodo = "hoje";
@@ -25,6 +27,8 @@ const gruposContainer = document.getElementById("gruposAdicionaisEmpresa");
 const adicionalGrupoSelect = document.getElementById("adicionalGrupo");
 const vinculoProdutoSelect = document.getElementById("vinculoProduto");
 const vinculoGrupoSelect = document.getElementById("vinculoGrupo");
+const varianteProdutoSelect = document.getElementById("varianteProduto");
+const filaCozinha = document.getElementById("filaCozinha");
 
 function linhaVazia(colunas, mensagem) {
     const tr = document.createElement("tr");
@@ -43,6 +47,18 @@ function textoStatus(status) {
         entregue: "Entregue",
         cancelado: "Cancelado"
     })[status] || "Recebido";
+}
+
+function textoStatusPedido(pedido) {
+    if (pedido?.status === "preparando" && pedido?.pronto_em) return "Pronto para retirada";
+    return textoStatus(pedido?.status);
+}
+
+function pedidoAtrasado(pedido, agora = Date.now()) {
+    if (pedido?.status !== "preparando" || pedido?.pronto_em) return false;
+    const inicio = new Date(pedido.preparo_iniciado_em || pedido.created_at).getTime();
+    const limite = Math.max(5, Number(pedido.preparo_estimado_minutos || 30)) * 60000;
+    return Number.isFinite(inicio) && inicio + limite < agora;
 }
 
 function inicioDoPeriodo() {
@@ -211,7 +227,10 @@ function pedidosVisiveis() {
     return pedidos.filter((pedido) => {
         const data = new Date(pedido.created_at).getTime();
         const noPeriodo = filtroPeriodo === "todos" || (Number.isFinite(data) && data >= inicio);
-        const statusOk = filtroStatusPedido === "todos" || pedido.status === filtroStatusPedido;
+        const statusOk = filtroStatusPedido === "todos"
+            || (filtroStatusPedido === "pronto" && pedido.status === "preparando" && Boolean(pedido.pronto_em))
+            || (filtroStatusPedido === "preparando" && pedido.status === "preparando" && !pedido.pronto_em)
+            || pedido.status === filtroStatusPedido;
         const conteudo = [pedido.numero, pedido.cliente_nome, pedido.endereco, ...(pedido.pedido_itens || []).map((item) => item.nome_produto)].join(" ").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
         return noPeriodo && statusOk && (!termo || conteudo.includes(termo));
     });
@@ -229,7 +248,29 @@ async function atualizarPedido(pedido, alteracoes, botao) {
     }
     Object.assign(pedido, alteracoes);
     renderizarPedidos(); atualizarIndicadores();
-    window.AppToast?.("Pedido atualizado", `Pedido #${pedido.numero || String(pedido.id).slice(0, 8)}: ${textoStatus(pedido.status)}.`, "success");
+    window.AppToast?.("Pedido atualizado", `Pedido #${pedido.numero || String(pedido.id).slice(0, 8)}: ${textoStatusPedido(pedido)}.`, "success");
+    return true;
+}
+
+async function executarAcaoOperacional(pedido, acao, botao, preparoEstimado = null, observacao = null) {
+    if (botao) App.definirCarregando(botao, true, "Atualizando...");
+    const { data, error } = await window.db.rpc("empresa_atualizar_operacao_pedido", {
+        p_pedido_id: pedido.id,
+        p_acao: acao,
+        p_preparo_estimado: preparoEstimado,
+        p_observacao: observacao
+    });
+    if (botao) App.definirCarregando(botao, false);
+    if (error || !data) {
+        alert(`Não foi possível atualizar a operação: ${App.mensagemErro(error)}`);
+        return false;
+    }
+    const atualizado = Array.isArray(data) ? data[0] : data;
+    Object.assign(pedido, atualizado || {});
+    renderizarPedidos();
+    renderizarFilaCozinha();
+    atualizarIndicadores();
+    window.AppToast?.("Operação atualizada", `Pedido #${pedido.numero || String(pedido.id).slice(0, 8)}: ${textoStatusPedido(pedido)}.`, "success");
     return true;
 }
 
@@ -244,11 +285,13 @@ function criarCardPedido(pedido, indice) {
     const telefoneNumero = App.somenteNumeros(pedido.cliente_telefone);
     if (telefoneNumero) { const telefone = criarElemento("a", "", pedido.cliente_telefone); telefone.href = `tel:${telefoneNumero}`; cliente.append(telefone); }
     if (pedido.entregador_id) cliente.append(criarElemento("span", "driver-badge", "✓ Entregador atribuído"));
+    if (pedido.status === "preparando" && pedido.pronto_em) cliente.append(criarElemento("span", "driver-badge", "✓ Pronto para retirada"));
     const itens = criarElemento("div", "order-items");
     (pedido.pedido_itens || []).forEach((item) => {
         const linha = criarElemento("div", "order-item");
         linha.append(criarElemento("strong", "", `${item.quantidade || 1}x ${item.nome_produto || "Produto"}`));
         const detalhes = [];
+        if (item.variante_nome) detalhes.push(item.variante_nome);
         if (Array.isArray(item.adicionais) && item.adicionais.length) detalhes.push(item.adicionais.map((adicional) => adicional.nome).filter(Boolean).join(", "));
         if (item.observacao) detalhes.push(`Obs.: ${item.observacao}`);
         if (detalhes.length) linha.append(criarElemento("small", "", detalhes.join(" • ")));
@@ -261,8 +304,33 @@ function criarCardPedido(pedido, indice) {
     const pagamento = criarElemento("span", `payment-chip ${pedido.pagamento_status === "pago" ? "pago" : ""}`, pedido.pagamento_status === "pago" ? "Pago" : pedido.pagamento_modalidade === "online" ? "Online pendente" : `${pedido.pagamento || "Pagamento"} pendente`);
     total.append(pagamento, criarElemento("strong", "", App.dinheiro(pedido.total))); card.append(total);
     const acoes = criarElemento("div", "order-card-actions");
-    const proxima = { recebido: ["preparando", "Iniciar preparo"], preparando: ["saiu_para_entrega", "Enviar para entrega"], saiu_para_entrega: ["entregue", "Confirmar entrega"] }[pedido.status];
-    if (proxima) { const foraDaJanela = pedido.status === "recebido" && pedido.agendado_para && new Date(pedido.agendado_para).getTime() > Date.now() + 30 * 60 * 1000; const avancar = criarElemento("button", "order-action primary", foraDaJanela ? "Aguardando horário" : proxima[1]); avancar.type = "button"; avancar.disabled = Boolean(foraDaJanela); if (foraDaJanela) avancar.title = "O preparo é liberado 30 minutos antes do horário agendado."; else avancar.addEventListener("click", () => atualizarPedido(pedido, { status: proxima[0] }, avancar)); acoes.append(avancar); }
+    if (pedido.status === "recebido") {
+        const foraDaJanela = pedido.agendado_para && new Date(pedido.agendado_para).getTime() > Date.now() + 30 * 60 * 1000;
+        const avancar = criarElemento("button", "order-action primary", foraDaJanela ? "Aguardando horário" : "Iniciar preparo");
+        avancar.type = "button"; avancar.disabled = Boolean(foraDaJanela);
+        if (foraDaJanela) avancar.title = "O preparo é liberado 30 minutos antes do horário agendado.";
+        else avancar.addEventListener("click", () => executarAcaoOperacional(pedido, "iniciar_preparo", avancar, Number(empresa?.tempo_estimado_min || 30)));
+        acoes.append(avancar);
+    } else if (pedido.status === "preparando" && !pedido.pronto_em) {
+        const pronto = criarElemento("button", "order-action primary", "Marcar pronto"); pronto.type = "button";
+        pronto.addEventListener("click", () => executarAcaoOperacional(pedido, "marcar_pronto", pronto)); acoes.append(pronto);
+    } else if (pedido.status === "preparando" && pedido.pronto_em) {
+        if (pedido.entregador_id) {
+            const aguardando = criarElemento("span", "order-action waiting", "Aguardando retirada do entregador");
+            acoes.append(aguardando);
+        } else {
+            const enviar = criarElemento("button", "order-action primary", "Enviar para entrega"); enviar.type = "button";
+            enviar.addEventListener("click", () => executarAcaoOperacional(pedido, "enviar_entrega", enviar)); acoes.append(enviar);
+        }
+    } else if (pedido.status === "saiu_para_entrega") {
+        if (pedido.entregador_id) {
+            const aguardando = criarElemento("span", "order-action waiting", "Entrega em andamento com entregador");
+            acoes.append(aguardando);
+        } else {
+            const concluir = criarElemento("button", "order-action primary", "Confirmar entrega"); concluir.type = "button";
+            concluir.addEventListener("click", () => executarAcaoOperacional(pedido, "confirmar_entrega", concluir)); acoes.append(concluir);
+        }
+    }
     if (pedido.pagamento_status !== "pago" && pedido.status !== "cancelado" && pedido.pagamento_modalidade !== "online") { const pago = criarElemento("button", "order-action secondary", "Marcar pago"); pago.type = "button"; pago.addEventListener("click", () => atualizarPedido(pedido, { pagamento_status: "pago" }, pago)); acoes.append(pago); }
     const chat = criarElemento("button", "order-action secondary", "Chat"); chat.type = "button"; chat.addEventListener("click", () => abrirChatPedido(pedido)); acoes.append(chat);
     if (["recebido", "preparando"].includes(pedido.status) && pedido.pagamento_status !== "pago") { const cancelar = criarElemento("button", "order-action cancel", "×"); cancelar.type = "button"; cancelar.setAttribute("aria-label", "Cancelar pedido"); cancelar.addEventListener("click", () => { if (confirm(`Cancelar o pedido #${pedido.numero || ""}?`)) atualizarPedido(pedido, { status: "cancelado" }, cancelar); }); acoes.append(cancelar); }
@@ -318,17 +386,124 @@ function renderizarAvaliacoesEmpresa() {
     });
 }
 
+function minutosPreparoPedido(pedido, agora = Date.now()) {
+    const inicio = new Date(pedido.preparo_iniciado_em || pedido.created_at).getTime();
+    if (!Number.isFinite(inicio)) return 0;
+    return Math.max(0, Math.round((agora - inicio) / 60000));
+}
+
+function criarTicketCozinha(pedido) {
+    const atrasado = pedidoAtrasado(pedido);
+    const pronto = pedido.status === "preparando" && Boolean(pedido.pronto_em);
+    const ticket = criarElemento("article", `kitchen-ticket${atrasado ? " late" : ""}${pronto ? " ready" : ""}`);
+    const header = criarElemento("header");
+    header.append(
+        criarElemento("h3", "", `#${pedido.numero || String(pedido.id).slice(0, 8)}`),
+        criarElemento("time", "", new Date(pedido.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }))
+    );
+    ticket.append(header, criarElemento("p", "ticket-customer", `${pedido.cliente_nome || "Cliente"} • ${pedido.pagamento_status === "pago" ? "Pago" : "Pagamento pendente"}`));
+
+    const itens = criarElemento("div", "ticket-items");
+    (pedido.pedido_itens || []).forEach((item) => {
+        const linha = criarElemento("div");
+        const nome = `${item.quantidade || 1}x ${item.nome_produto || "Produto"}${item.variante_nome ? ` • ${item.variante_nome}` : ""}`;
+        linha.append(criarElemento("strong", "", nome));
+        const detalhes = [];
+        if (Array.isArray(item.adicionais) && item.adicionais.length) detalhes.push(item.adicionais.map((adicional) => adicional.nome).filter(Boolean).join(", "));
+        if (item.observacao) detalhes.push(`Obs.: ${item.observacao}`);
+        if (detalhes.length) linha.append(criarElemento("small", "", detalhes.join(" • ")));
+        itens.append(linha);
+    });
+    if (!itens.children.length) itens.append(criarElemento("small", "", "Itens indisponíveis"));
+    ticket.append(itens);
+    if (pedido.observacoes) ticket.append(criarElemento("p", "order-note", pedido.observacoes));
+
+    const timer = criarElemento("div", "ticket-timer");
+    if (pedido.status === "recebido") {
+        timer.append(criarElemento("span", "", pedido.agendado_para ? `Agendado para ${new Date(pedido.agendado_para).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}` : "Aguardando início"));
+    } else if (pronto) {
+        timer.append(criarElemento("span", "", "Pronto há"), criarElemento("strong", "", `${Math.max(0, Math.round((Date.now() - new Date(pedido.pronto_em).getTime()) / 60000))} min`));
+    } else {
+        const usados = minutosPreparoPedido(pedido);
+        const estimado = Math.max(5, Number(pedido.preparo_estimado_minutos || 30));
+        timer.append(criarElemento("span", "", atrasado ? "Atrasado" : "Tempo de preparo"), criarElemento("strong", "", `${usados}/${estimado} min`));
+    }
+    ticket.append(timer);
+
+    const acoes = criarElemento("div", "ticket-actions");
+    if (pedido.status === "recebido") {
+        const select = document.createElement("select");
+        select.className = "prep-time-select";
+        [15, 20, 25, 30, 40, 50, 60, 90].forEach((minutos) => {
+            const option = document.createElement("option"); option.value = String(minutos); option.textContent = `${minutos} min`;
+            if (minutos === Number(empresa?.tempo_estimado_min || 30)) option.selected = true;
+            select.append(option);
+        });
+        const iniciar = criarElemento("button", "start", "Iniciar preparo"); iniciar.type = "button";
+        iniciar.addEventListener("click", () => executarAcaoOperacional(pedido, "iniciar_preparo", iniciar, Number(select.value)));
+        acoes.append(select, iniciar);
+    } else if (pedido.status === "preparando" && !pronto) {
+        const concluir = criarElemento("button", "ready", "Marcar pronto"); concluir.type = "button";
+        concluir.addEventListener("click", () => executarAcaoOperacional(pedido, "marcar_pronto", concluir));
+        acoes.append(concluir);
+    } else if (pronto) {
+        const reabrir = criarElemento("button", "secondary", "Voltar ao preparo"); reabrir.type = "button";
+        reabrir.addEventListener("click", () => executarAcaoOperacional(pedido, "reabrir_preparo", reabrir));
+        const enviar = criarElemento("button", "route", pedido.entregador_id ? "Liberar retirada" : "Enviar para entrega"); enviar.type = "button";
+        enviar.addEventListener("click", () => executarAcaoOperacional(pedido, "enviar_entrega", enviar));
+        acoes.append(reabrir, enviar);
+    }
+    if (acoes.children.length) ticket.append(acoes);
+    return ticket;
+}
+
+function renderizarFilaCozinha() {
+    if (!filaCozinha) return;
+    const ativos = pedidos.filter((pedido) => ["recebido", "preparando"].includes(pedido.status));
+    const recebidos = ativos.filter((pedido) => pedido.status === "recebido");
+    const preparando = ativos.filter((pedido) => pedido.status === "preparando" && !pedido.pronto_em);
+    const prontos = ativos.filter((pedido) => pedido.status === "preparando" && pedido.pronto_em);
+    const atrasados = preparando.filter((pedido) => pedidoAtrasado(pedido));
+    const concluidosPreparo = pedidos.filter((pedido) => pedido.pronto_em && pedido.preparo_iniciado_em);
+    const media = concluidosPreparo.length
+        ? Math.round(concluidosPreparo.reduce((soma, pedido) => soma + Math.max(0, (new Date(pedido.pronto_em) - new Date(pedido.preparo_iniciado_em)) / 60000), 0) / concluidosPreparo.length)
+        : 0;
+
+    document.getElementById("cozinhaRecebidos").textContent = String(recebidos.length);
+    document.getElementById("cozinhaPreparando").textContent = String(preparando.length);
+    document.getElementById("cozinhaProntos").textContent = String(prontos.length);
+    document.getElementById("cozinhaAtrasados").textContent = String(atrasados.length);
+    document.getElementById("cozinhaTempoMedio").textContent = `${media} min`;
+    document.getElementById("pedidosCozinhaMenu").textContent = String(ativos.length);
+
+    const colunas = [
+        { nome: "Aguardando", lista: recebidos },
+        { nome: "Em preparo", lista: preparando.sort((a, b) => Number(b.prioridade || 0) - Number(a.prioridade || 0) || new Date(a.created_at) - new Date(b.created_at)) },
+        { nome: "Prontos", lista: prontos.sort((a, b) => new Date(a.pronto_em) - new Date(b.pronto_em)) }
+    ];
+    filaCozinha.replaceChildren();
+    colunas.forEach((coluna) => {
+        const bloco = criarElemento("section", "kitchen-column");
+        const header = criarElemento("header"); header.append(criarElemento("strong", "", coluna.nome), criarElemento("span", "", String(coluna.lista.length)));
+        const lista = criarElemento("div", "kitchen-list");
+        if (coluna.lista.length) coluna.lista.forEach((pedido) => lista.append(criarTicketCozinha(pedido)));
+        else lista.append(criarElemento("div", "column-empty", "Nenhum pedido"));
+        bloco.append(header, lista); filaCozinha.append(bloco);
+    });
+}
+
 function renderizarPedidos() {
     const colunas = [
-        { id: "recebido", nome: "Recebidos", aceita: ["recebido"] },
-        { id: "preparando", nome: "Preparando", aceita: ["preparando"] },
-        { id: "saiu_para_entrega", nome: "Em entrega", aceita: ["saiu_para_entrega"] },
-        { id: "finalizados", nome: "Finalizados", aceita: ["entregue", "cancelado"] }
+        { id: "recebido", nome: "Recebidos", filtra: (pedido) => pedido.status === "recebido" },
+        { id: "preparando", nome: "Preparando", filtra: (pedido) => pedido.status === "preparando" && !pedido.pronto_em },
+        { id: "pronto", nome: "Prontos", filtra: (pedido) => pedido.status === "preparando" && Boolean(pedido.pronto_em) },
+        { id: "saiu_para_entrega", nome: "Em entrega", filtra: (pedido) => pedido.status === "saiu_para_entrega" },
+        { id: "finalizados", nome: "Finalizados", filtra: (pedido) => ["entregue", "cancelado"].includes(pedido.status) }
     ];
     const visiveis = pedidosVisiveis();
     listaPedidos.replaceChildren();
     colunas.forEach((coluna) => {
-        const pedidosColuna = visiveis.filter((pedido) => coluna.aceita.includes(pedido.status));
+        const pedidosColuna = visiveis.filter(coluna.filtra);
         const bloco = criarElemento("section", "kanban-column"); bloco.dataset.column = coluna.id;
         const cabecalho = criarElemento("header", "kanban-column-header"); const titulo = criarElemento("div"); titulo.append(criarElemento("i"), criarElemento("strong", "", coluna.nome)); cabecalho.append(titulo, criarElemento("span", "", String(pedidosColuna.length)));
         const lista = criarElemento("div", "kanban-list");
@@ -337,6 +512,7 @@ function renderizarPedidos() {
         bloco.append(cabecalho, lista); listaPedidos.append(bloco);
     });
     document.getElementById("ultimaAtualizacao").textContent = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    renderizarFilaCozinha();
 }
 function atualizarSelectCategorias() {
     const valorAtual = categoriaSelect.value;
@@ -412,7 +588,7 @@ function nomeCategoria(id) {
 function renderizarProdutos() {
     listaProdutos.replaceChildren();
     if (!produtos.length) {
-        listaProdutos.append(linhaVazia(5, "Nenhum produto cadastrado."));
+        listaProdutos.append(linhaVazia(6, "Nenhum produto cadastrado."));
         atualizarIndicadores();
         return;
     }
@@ -434,6 +610,10 @@ function renderizarProdutos() {
         const preco = document.createElement("td");
         const promocao = Number(produto.promocao || 0);
         preco.textContent = App.dinheiro(promocao > 0 ? promocao : produto.preco);
+
+        const variantes = document.createElement("td");
+        const totalVariantes = variantesProduto.filter((item) => String(item.produto_id) === String(produto.id)).length;
+        variantes.textContent = totalVariantes ? String(totalVariantes) : "—";
 
         const disponibilidade = document.createElement("td");
         const checkbox = document.createElement("input");
@@ -469,10 +649,13 @@ function renderizarProdutos() {
         excluir.addEventListener("click", async () => {
             if (!confirm(`Excluir o produto “${produto.nome}”?`)) return;
             excluir.disabled = true;
-            const { error: erroVinculos } = await window.db.from("produto_grupos").delete().eq("produto_id", produto.id);
-            if (erroVinculos) {
+            const [{ error: erroVinculos }, { error: erroVariantes }] = await Promise.all([
+                window.db.from("produto_grupos").delete().eq("produto_id", produto.id),
+                window.db.from("produto_variantes").delete().eq("produto_id", produto.id)
+            ]);
+            if (erroVinculos || erroVariantes) {
                 excluir.disabled = false;
-                alert(`Não foi possível remover os vínculos do produto: ${erroVinculos.message}`);
+                alert(`Não foi possível remover as dependências do produto: ${App.mensagemErro(erroVinculos || erroVariantes)}`);
                 return;
             }
             const { error } = await window.db.from("produtos").delete().eq("id", produto.id);
@@ -482,6 +665,7 @@ function renderizarProdutos() {
                 return;
             }
             produtos = produtos.filter((item) => String(item.id) !== String(produto.id));
+            variantesProduto = variantesProduto.filter((item) => String(item.produto_id) !== String(produto.id));
             vinculosProdutoGrupo = vinculosProdutoGrupo.filter((item) => String(item.produto_id) !== String(produto.id));
             renderizarProdutos();
             renderizarGruposAdicionais();
@@ -489,11 +673,13 @@ function renderizarProdutos() {
         grupo.append(editar, excluir);
         acoes.append(grupo);
 
-        tr.append(nome, categoria, preco, disponibilidade, acoes);
+        tr.append(nome, categoria, preco, variantes, disponibilidade, acoes);
         listaProdutos.append(tr);
     });
     atualizarIndicadores();
     atualizarSelectsPersonalizacao();
+    atualizarSelectVariantes();
+    renderizarVariantes();
 }
 
 function preencherSelect(select, itens, placeholder) {
@@ -517,6 +703,90 @@ function atualizarSelectsPersonalizacao() {
     preencherSelect(adicionalGrupoSelect, gruposAdicionais, gruposAdicionais.length ? "Selecione o grupo" : "Crie um grupo primeiro");
     preencherSelect(vinculoGrupoSelect, gruposAdicionais, gruposAdicionais.length ? "Selecione o grupo" : "Crie um grupo primeiro");
     preencherSelect(vinculoProdutoSelect, produtos, produtos.length ? "Selecione o produto" : "Cadastre um produto primeiro");
+}
+
+
+function atualizarSelectVariantes() {
+    if (!varianteProdutoSelect) return;
+    preencherSelect(varianteProdutoSelect, produtos, produtos.length ? "Selecione o produto" : "Cadastre um produto primeiro");
+}
+
+function renderizarVariantes() {
+    const container = document.getElementById("variantesEmpresa");
+    if (!container) return;
+    document.getElementById("resumoVariantes").textContent = `${variantesProduto.length} ${variantesProduto.length === 1 ? "variação" : "variações"}`;
+    container.replaceChildren();
+    if (!produtos.length) {
+        container.append(criarElemento("p", "empty", "Cadastre um produto para adicionar variações."));
+        return;
+    }
+    if (!variantesProduto.length) {
+        container.append(criarElemento("p", "empty", "Nenhuma variação cadastrada. Produtos sem variação usam o preço principal."));
+        return;
+    }
+    const ordenadas = [...variantesProduto].sort((a, b) => {
+        const pa = produtos.find((produto) => String(produto.id) === String(a.produto_id))?.nome || "";
+        const pb = produtos.find((produto) => String(produto.id) === String(b.produto_id))?.nome || "";
+        return pa.localeCompare(pb, "pt-BR") || Number(a.ordem || 0) - Number(b.ordem || 0) || String(a.nome).localeCompare(String(b.nome), "pt-BR");
+    });
+    ordenadas.forEach((variante) => {
+        const produto = produtos.find((item) => String(item.id) === String(variante.produto_id));
+        const linha = criarElemento("article", "variant-row");
+        const info = criarElemento("div");
+        info.append(criarElemento("strong", "", `${produto?.nome || "Produto"} • ${variante.nome || "Variação"}`), criarElemento("small", "", variante.promocao ? `De ${App.dinheiro(variante.preco)} por ${App.dinheiro(variante.promocao)}` : "Preço específico da variação"));
+        const preco = criarElemento("span", "price", App.dinheiro(Number(variante.promocao || 0) > 0 ? variante.promocao : variante.preco));
+        const estado = criarElemento("span", `variant-state${variante.ativo === false ? " off" : ""}`, variante.ativo === false ? "Pausada" : "Ativa");
+        const acoes = criarElemento("div", "acoes-tabela");
+        const alternar = criarElemento("button", "btn-mini secundario", variante.ativo === false ? "Ativar" : "Pausar"); alternar.type = "button";
+        alternar.addEventListener("click", async () => {
+            alternar.disabled = true;
+            const { error } = await window.db.from("produto_variantes").update({ ativo: variante.ativo === false }).eq("id", variante.id);
+            alternar.disabled = false;
+            if (error) return alert(`Não foi possível atualizar a variação: ${App.mensagemErro(error)}`);
+            variante.ativo = variante.ativo === false;
+            renderizarVariantes(); renderizarProdutos();
+        });
+        const excluir = criarElemento("button", "btn-mini perigo", "Excluir"); excluir.type = "button";
+        excluir.addEventListener("click", async () => {
+            if (!confirm(`Excluir a variação “${variante.nome}”?`)) return;
+            excluir.disabled = true;
+            const { error } = await window.db.from("produto_variantes").delete().eq("id", variante.id);
+            if (error) { excluir.disabled = false; return alert(`Não foi possível excluir: ${App.mensagemErro(error)}`); }
+            variantesProduto = variantesProduto.filter((item) => String(item.id) !== String(variante.id));
+            renderizarVariantes(); renderizarProdutos();
+        });
+        acoes.append(alternar, excluir);
+        linha.append(info, preco, estado, acoes); container.append(linha);
+    });
+}
+
+function renderizarEstoqueMovimentos() {
+    const container = document.getElementById("estoqueMovimentos");
+    if (!container) return;
+    container.replaceChildren();
+    if (!estoqueMovimentos.length) {
+        container.append(criarElemento("p", "empty", "Nenhuma movimentação registrada."));
+        return;
+    }
+    estoqueMovimentos.slice(0, 50).forEach((movimento) => {
+        const produto = produtos.find((item) => String(item.id) === String(movimento.produto_id));
+        const linha = criarElemento("article", "stock-movement");
+        const info = criarElemento("div");
+        info.append(criarElemento("strong", "", produto?.nome || "Produto removido"), criarElemento("small", "", `${movimento.quantidade_anterior} → ${movimento.quantidade_nova} • ${String(movimento.motivo || "alteração").replaceAll("_", " ")}`));
+        const delta = Number(movimento.delta || 0);
+        linha.append(info, criarElemento("span", `stock-delta ${delta >= 0 ? "positive" : "negative"}`, `${delta >= 0 ? "+" : ""}${delta}`), criarElemento("time", "stock-time", new Date(movimento.created_at).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })));
+        container.append(linha);
+    });
+}
+
+async function carregarEstoqueMovimentos() {
+    if (!empresa) return;
+    const { data, error } = await window.db.from("estoque_movimentos").select("*").eq("empresa_id", String(empresa.id)).order("created_at", { ascending: false }).limit(50);
+    if (error) {
+        console.warn("Histórico de estoque indisponível:", error);
+        estoqueMovimentos = [];
+    } else estoqueMovimentos = data || [];
+    renderizarEstoqueMovimentos();
 }
 
 async function removerAdicional(adicional) {
@@ -722,19 +992,28 @@ async function carregarPainel() {
 
         const grupoIds = gruposAdicionais.map((grupo) => String(grupo.id));
         const produtoIds = produtos.map((produto) => String(produto.id));
-        const [resAdicionais, resVinculos] = await Promise.all([
+        const [resAdicionais, resVinculos, resVariantes, resMovimentos] = await Promise.all([
             grupoIds.length
                 ? window.db.from("adicionais").select("*").in("grupo_id", grupoIds).order("nome")
                 : Promise.resolve({ data: [], error: null }),
             produtoIds.length
                 ? window.db.from("produto_grupos").select("*").in("produto_id", produtoIds)
-                : Promise.resolve({ data: [], error: null })
+                : Promise.resolve({ data: [], error: null }),
+            produtoIds.length
+                ? window.db.from("produto_variantes").select("*").in("produto_id", produtoIds).order("ordem").order("nome")
+                : Promise.resolve({ data: [], error: null }),
+            window.db.from("estoque_movimentos").select("*").eq("empresa_id", String(empresa.id)).order("created_at", { ascending: false }).limit(50)
         ]);
         adicionaisEmpresa = resAdicionais.error ? [] : (resAdicionais.data || []);
         vinculosProdutoGrupo = resVinculos.error ? [] : (resVinculos.data || []);
+        variantesProduto = resVariantes.error ? [] : (resVariantes.data || []);
+        estoqueMovimentos = resMovimentos.error ? [] : (resMovimentos.data || []);
         renderizarPedidos();
         renderizarCategorias();
         renderizarProdutos();
+        renderizarVariantes();
+        renderizarEstoqueMovimentos();
+        renderizarFilaCozinha();
         renderizarGruposAdicionais();
         renderizarCuponsEmpresa();
         renderizarAvaliacoesEmpresa();
@@ -743,7 +1022,7 @@ async function carregarPainel() {
         console.error("Erro ao carregar painel:", erro);
         App.mostrarErroPagina("Não foi possível carregar o painel do restaurante.");
         listaPedidos.replaceChildren(criarElemento("div", "empty-state", "Falha ao carregar pedidos."));
-        listaProdutos.replaceChildren(linhaVazia(5, "Falha ao carregar produtos."));
+        listaProdutos.replaceChildren(linhaVazia(6, "Falha ao carregar produtos."));
     }
 }
 
@@ -917,6 +1196,42 @@ document.getElementById("produtoForm").addEventListener("submit", async (event) 
     renderizarGruposAdicionais();
 });
 
+document.getElementById("varianteForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const produtoId = varianteProdutoSelect.value;
+    const nome = document.getElementById("varianteNome").value.trim();
+    const preco = Number(document.getElementById("variantePreco").value);
+    const promocaoTexto = document.getElementById("variantePromocao").value;
+    const promocao = promocaoTexto === "" ? null : Number(promocaoTexto);
+    if (!produtoId) return alert("Selecione um produto.");
+    if (!nome) return alert("Informe o nome da variação.");
+    if (!Number.isFinite(preco) || preco < 0) return alert("Informe um preço válido.");
+    if (promocao !== null && (!Number.isFinite(promocao) || promocao <= 0 || promocao >= preco)) {
+        return alert("O preço promocional deve ser maior que zero e menor que o preço normal.");
+    }
+    if (variantesProduto.some((item) => String(item.produto_id) === produtoId && String(item.nome).toLowerCase() === nome.toLowerCase())) {
+        return alert("Essa variação já existe para o produto.");
+    }
+    const botao = document.getElementById("varianteSalvar");
+    App.definirCarregando(botao, true, "Adicionando...");
+    const { data, error } = await window.db.from("produto_variantes").insert({
+        produto_id: produtoId,
+        nome,
+        preco,
+        promocao,
+        ordem: variantesProduto.filter((item) => String(item.produto_id) === produtoId).length,
+        ativo: document.getElementById("varianteAtiva").checked
+    }).select("*").single();
+    App.definirCarregando(botao, false);
+    if (error) return alert(`Não foi possível adicionar a variação: ${App.mensagemErro(error)}`);
+    variantesProduto.push(data);
+    event.currentTarget.reset();
+    document.getElementById("varianteAtiva").checked = true;
+    varianteProdutoSelect.value = produtoId;
+    renderizarVariantes(); renderizarProdutos();
+    window.AppToast?.("Variação adicionada", `${nome} já está disponível no produto.`, "success");
+});
+
 document.getElementById("grupoAdicionalForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!empresa) return;
@@ -1060,6 +1375,18 @@ document.getElementById("atualizarPedidos").addEventListener("click", async (eve
     await recarregarPedidos();
     App.definirCarregando(botao, false);
 });
+document.getElementById("atualizarCozinha").addEventListener("click", async (event) => {
+    const botao = event.currentTarget;
+    App.definirCarregando(botao, true, "Atualizando...");
+    await recarregarPedidos();
+    App.definirCarregando(botao, false);
+});
+document.getElementById("atualizarEstoqueMovimentos").addEventListener("click", async (event) => {
+    const botao = event.currentTarget;
+    App.definirCarregando(botao, true, "Atualizando...");
+    await carregarEstoqueMovimentos();
+    App.definirCarregando(botao, false);
+});
 document.getElementById("ativarAlertas").addEventListener("click", async () => {
     alertasAtivos = !alertasAtivos;
     if (alertasAtivos) {
@@ -1097,12 +1424,48 @@ menuDashboard.addEventListener("click", () => {
     sidebar.classList.toggle("open", abrir); sidebarOverlay.classList.toggle("show", abrir); menuDashboard.setAttribute("aria-expanded", String(abrir));
 });
 sidebarOverlay.addEventListener("click", fecharSidebar);
-sidebar.querySelectorAll("nav a").forEach((link) => link.addEventListener("click", () => {
-    sidebar.querySelectorAll("nav a").forEach((item) => item.classList.toggle("active", item === link));
+
+const dashboardViews = [...document.querySelectorAll("[data-dashboard-view]")];
+const dashboardLinks = [...sidebar.querySelectorAll('nav a[href^="#"]')];
+const dashboardViewIds = new Set(dashboardViews.map((view) => view.id));
+
+function idSecaoPainel(valor = location.hash) {
+    const id = String(valor || "").replace(/^#/, "");
+    return dashboardViewIds.has(id) ? id : "visaoGeral";
+}
+
+function mostrarSecaoPainel(id, { atualizarHistorico = false, focar = false } = {}) {
+    const secaoId = idSecaoPainel(id);
+    dashboardViews.forEach((view) => {
+        const ativa = view.id === secaoId;
+        view.hidden = !ativa;
+        view.classList.toggle("is-active", ativa);
+        view.setAttribute("aria-hidden", String(!ativa));
+    });
+    dashboardLinks.forEach((link) => {
+        const ativo = link.getAttribute("href") === `#${secaoId}`;
+        link.classList.toggle("active", ativo);
+        if (ativo) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+    });
+    if (atualizarHistorico && location.hash !== `#${secaoId}`) {
+        history.pushState({ dashboardView: secaoId }, "", `#${secaoId}`);
+    }
     fecharSidebar();
+    window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    if (focar) document.getElementById(secaoId)?.focus({ preventScroll: true });
+}
+
+dashboardLinks.forEach((link) => link.addEventListener("click", (event) => {
+    event.preventDefault();
+    mostrarSecaoPainel(link.hash, { atualizarHistorico: true, focar: true });
 }));
+addEventListener("popstate", () => mostrarSecaoPainel(location.hash));
+addEventListener("hashchange", () => mostrarSecaoPainel(location.hash));
+mostrarSecaoPainel(location.hash);
 
 atualizarBotaoAlertas();
+setInterval(() => { if (empresa) renderizarFilaCozinha(); }, 30000);
 carregarPainel();
 
 // Atualização em tempo real dos pedidos do restaurante.

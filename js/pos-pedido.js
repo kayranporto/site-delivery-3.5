@@ -6,7 +6,7 @@
             .map((item) => String(item.id))
             .sort()
             .join("-");
-        return `${produto.id}|${adicionais}|${produto.observacao || ""}`;
+        return `${produto.id}|${produto.variante_id || "sem-variante"}|${adicionais}|${produto.observacao || ""}`;
     }
 
     function alterarBotao(botao, carregando) {
@@ -44,7 +44,7 @@
                 .map((adicional) => String(adicional?.id || ""))
                 .filter(Boolean))];
 
-            const [empresaResposta, produtosResposta, adicionaisResposta, vinculosResposta] = await Promise.all([
+            const [empresaResposta, produtosResposta, adicionaisResposta, vinculosResposta, variantesResposta] = await Promise.all([
                 db.from("empresas_catalogo")
                     .select("id,nome,taxa_entrega,pedido_minimo,status,cidade_atendimento,uf_atendimento,bairros_atendidos,tempo_estimado_min,tempo_estimado_max")
                     .eq("id", String(pedido.empresa_id))
@@ -63,6 +63,12 @@
                     ? db.from("produto_grupos")
                         .select("produto_id,grupo_id")
                         .in("produto_id", produtoIds)
+                    : Promise.resolve({ data: [], error: null }),
+                produtoIds.length
+                    ? db.from("produto_variantes")
+                        .select("id,produto_id,nome,preco,promocao,ativo")
+                        .in("produto_id", produtoIds)
+                        .eq("ativo", true)
                     : Promise.resolve({ data: [], error: null })
             ]);
 
@@ -70,6 +76,7 @@
             if (produtosResposta.error) throw produtosResposta.error;
             if (adicionaisResposta.error) throw adicionaisResposta.error;
             if (vinculosResposta.error) throw vinculosResposta.error;
+            if (variantesResposta.error) throw variantesResposta.error;
             if (!empresaResposta.data) throw new Error("O restaurante não está disponível no catálogo.");
 
             const empresa = empresaResposta.data;
@@ -82,6 +89,12 @@
             const adicionais = new Map((adicionaisResposta.data || []).map((adicional) => [String(adicional.id), adicional]));
             const vinculos = new Set((vinculosResposta.data || [])
                 .map((vinculo) => `${String(vinculo.produto_id)}|${String(vinculo.grupo_id)}`));
+            const variantesPorProduto = new Map();
+            (variantesResposta.data || []).forEach((variante) => {
+                const chave = String(variante.produto_id);
+                if (!variantesPorProduto.has(chave)) variantesPorProduto.set(chave, []);
+                variantesPorProduto.get(chave).push(variante);
+            });
             let itensIgnorados = 0;
 
             const carrinho = pedido.pedido_itens.flatMap((item) => {
@@ -102,12 +115,21 @@
                     }];
                 });
 
+                const variantesAtivas = variantesPorProduto.get(String(produto.id)) || [];
+                const variante = item.variante_id ? variantesAtivas.find((opcao) => String(opcao.id) === String(item.variante_id)) : null;
+                if (variantesAtivas.length && !variante) {
+                    itensIgnorados += 1;
+                    return [];
+                }
                 const promocao = Number(produto.promocao || 0);
+                const precoVariante = variante ? (Number(variante.promocao || 0) > 0 ? Number(variante.promocao) : Number(variante.preco || 0)) : null;
                 const novoItem = {
                     id: String(produto.id),
                     nome: produto.nome || item.nome_produto || "Produto",
                     imagem: produto.imagem || "assets/produto-padrao.svg",
-                    preco: promocao > 0 ? promocao : Number(produto.preco || 0),
+                    preco: variante ? precoVariante : (promocao > 0 ? promocao : Number(produto.preco || 0)),
+                    variante_id: variante ? String(variante.id) : null,
+                    variante_nome: variante?.nome || null,
                     quantidade: Math.min(99, Math.max(1, Number.parseInt(item.quantidade, 10) || 1)),
                     observacao: String(item.observacao || "").trim().slice(0, 300),
                     adicionais: extras,

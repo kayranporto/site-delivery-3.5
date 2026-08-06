@@ -3,6 +3,15 @@
 (() => {
     let enviados = 0;
     const limitePorPagina = 10;
+    const appVersion = window.DELIVERY_CONFIG?.appVersion || "desconhecida";
+    const correlationId = (() => {
+        const chave = "delivery_correlation_id";
+        const atual = sessionStorage.getItem(chave);
+        if (atual) return atual;
+        const novo = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        sessionStorage.setItem(chave, novo);
+        return novo;
+    })();
 
     function limpar(texto, maximo = 500) {
         return String(texto || "")
@@ -17,8 +26,11 @@
         try {
             const { data: { user } } = await window.db.auth.getUser();
             if (!user) return false;
-            const seguros = {};
-            Object.entries(detalhes || {}).slice(0, 10).forEach(([chave, valor]) => {
+            const seguros = {
+                app_version: appVersion,
+                correlation_id: correlationId
+            };
+            Object.entries(detalhes || {}).slice(0, 8).forEach(([chave, valor]) => {
                 seguros[limpar(chave, 60)] = limpar(typeof valor === "object" ? JSON.stringify(valor) : valor, 300);
             });
             const { error } = await window.db.from("app_logs").insert({
@@ -42,6 +54,5 @@
         registrar("error", "promise", event.reason?.message || event.reason || "Falha assíncrona");
     });
 
-    window.Monitoramento = Object.freeze({ registrar });
+    window.Monitoramento = Object.freeze({ registrar, correlationId, appVersion });
 })();
-
