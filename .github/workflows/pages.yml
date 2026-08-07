@@ -1,0 +1,45 @@
+name: Publicar GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Preparar arquivos públicos
+        shell: bash
+        run: |
+          mkdir -p _site
+          cp -R assets css js _site/
+          cp .nojekyll 404.html index.html acompanhamento.html admin.html cadastro.html checkout.html dados.html empresa-cadastro.html empresa-dashboard.html empresa-login.html enderecos.html entregador.html favoritos.html login.html meus-pedidos.html nova-senha.html offline.html pedido-sucesso.html perfil.html privacidade.html recuperar-senha.html restaurante.html suporte.html manifest.webmanifest robots.txt sitemap.xml sw.js _site/
+
+      - name: Enviar artefato
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4
