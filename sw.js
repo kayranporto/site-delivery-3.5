@@ -1,7 +1,7 @@
 "use strict";
 
-const CACHE = "multi-delivery-v4.2.1";
-const DYNAMIC_CACHE = "multi-delivery-dynamic-v4.2.1";
+const CACHE = "multi-delivery-v4.2.0";
+const DYNAMIC_CACHE = "multi-delivery-dynamic-v4.2.0";
 const SHELL = [
   "./",
   "./index.html",
