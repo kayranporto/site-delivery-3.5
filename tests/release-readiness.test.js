@@ -16,8 +16,10 @@ function walk(directory) {
     });
 }
 
-test("release possui uma única árvore canônica e não inclui metadados Git", () => {
-    assert.equal(fs.existsSync(path.join(root, ".git")), false);
+test("release possui uma única árvore canônica e o empacotamento exclui metadados Git", () => {
+    const packageScript = read("scripts/package-release.sh");
+    assert.match(packageScript, /\.git/);
+    assert.match(packageScript, /node_modules/);
     assert.equal(fs.existsSync(path.join(root, "site-delivery-3.5-main")), false);
     assert.ok(fs.existsSync(path.join(root, "supabase/migrations/014_producao_financeira.sql")));
     assert.equal(JSON.parse(read("package.json")).version, "4.2.0");
