@@ -37,4 +37,7 @@
 .admin-main:has(>.admin-section:target)>.admin-overview-grid{display:none}
 .admin-main>.admin-section:target{display:block}
 
+/* Garante que o loader e diálogos realmente desapareçam quando o atributo hidden for aplicado. */
+.admin-loading[hidden],.admin-app[hidden],.admin-modal[hidden],.ops-dialog[hidden]{display:none!important}
+
 /* Republicação solicitada após indisponibilidade temporária do artefato do Pages. */
