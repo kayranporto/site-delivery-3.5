@@ -36,3 +36,5 @@
 .admin-main:has(>.admin-section:target)>.admin-metrics,
 .admin-main:has(>.admin-section:target)>.admin-overview-grid{display:none}
 .admin-main>.admin-section:target{display:block}
+
+/* Republicação solicitada após indisponibilidade temporária do artefato do Pages. */
