@@ -29,3 +29,10 @@
 #promocoes .dashboard-card{min-width:0}
 #cupomFim{width:100%;min-width:0;max-width:100%;inline-size:100%}
 @media(min-width:1121px){#promocoes .management-grid{grid-template-columns:minmax(430px,.82fr) minmax(0,1.18fr)}}
+
+/* Painel administrativo por seções: mostra somente a função selecionada no menu. */
+.admin-main>.admin-section{display:none}
+.admin-main:has(>.admin-section:target)>.admin-hero,
+.admin-main:has(>.admin-section:target)>.admin-metrics,
+.admin-main:has(>.admin-section:target)>.admin-overview-grid{display:none}
+.admin-main>.admin-section:target{display:block}
